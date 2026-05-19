@@ -33,7 +33,7 @@ class SettingsScreen extends ConsumerWidget {
                   .map((m) => DropdownMenuItem(value: m, child: Text(m)))
                   .toList(),
               onChanged: (v) async {
-                if (v != null) await SettingsRepo().setThemeMode(v);
+                if (v != null) await (await SettingsRepo.getInstance()).setThemeMode(v);
                 // refresh by invalidating
                 ref.invalidate(themeModeProvider);
               },
@@ -63,7 +63,7 @@ class SettingsScreen extends ConsumerWidget {
                           initialDirectory: e.value,
                         );
                         if (result != null) {
-                          await SettingsRepo().setMediaRoot(e.key, result);
+                          await (await SettingsRepo.getInstance()).setMediaRoot(e.key, result);
                           ref.invalidate(mediaRootsProvider);
                         }
                       },

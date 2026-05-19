@@ -5,7 +5,7 @@ import '../services/media_scanner.dart';
 import '../services/settings_repo.dart';
 
 final themeModeProvider = FutureProvider<String>((ref) async {
-  return await SettingsRepo().getThemeMode();
+  return await (await SettingsRepo.getInstance()).getThemeMode();
 });
 
 final pornToggleProvider = StateNotifierProvider<PornToggleNotifier, bool>((ref) {
@@ -15,12 +15,12 @@ class PornToggleNotifier extends StateNotifier<bool> {
   PornToggleNotifier() : super(true);
   Future<void> toggle(bool value) async {
     state = value;
-    await SettingsRepo().setPornEnabled(value);
+    await (await SettingsRepo.getInstance()).setPornEnabled(value);
   }
 }
 
 final mediaRootsProvider = FutureProvider<Map<String, String>>((ref) async {
-  return await SettingsRepo().getMediaRoots();
+  return await (await SettingsRepo.getInstance()).getMediaRoots();
 });
 
 final allMediaProvider = FutureProvider<List<MediaItem>>((ref) async {

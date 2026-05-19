@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path/path.dart' as p;
 import '../core/constants.dart';
 
 class SettingsRepo {
@@ -7,34 +9,63 @@ class SettingsRepo {
   static const _keyPornEnabled = 'porn_enabled';
   static const _keyTheme = 'theme_mode';
 
-  static String? _env(String varName, String? override) => override ?? _envFromPlatform(varName);
+  late final Map<String, String> _envMap;
 
-  static String? _envFromPlatform(String varName) {
-    // Read from platform environment; null if not set
-    try {
-      return const String.fromEnvironment(varName);
-    } catch (_) {
-      return null;
+  /// Load environment overrides from a .env file if present.
+  /// Called once per app session (singleton pattern via static init).
+  static SettingsRepo? _instance;
+  static Future<SettingsRepo> getInstance() async {
+    _instance ??= await SettingsRepo._load();
+    return _instance!;
+  }
+
+  SettingsRepo._(this._envMap);
+
+  static Future<SettingsRepo> _load() async {
+    final env = <String, String>{};
+    final scriptDir = p.dirname(Platform.script.toFilePath());
+    final envPath = p.join(scriptDir, '..', '..', '.env');
+    final file = File(envPath);
+    if (file.existsSync()) {
+      try {
+        for (final line in file.readAsLinesSync()) {
+          final t = line.trim();
+          if (t.isEmpty || t.startsWith('#')) continue;
+          final eq = t.indexOf('=');
+          if (eq > 0) {
+            final key = t.substring(0, eq).trim();
+            final val = t.substring(eq + 1).trim();
+            if (key.isNotEmpty) env[key] = val;
+          }
+        }
+      } catch (_) { /* ignore bad env file */ }
     }
+    return SettingsRepo._(env);
   }
 
-  static String _dir(String envVar, String fallback) {
-    final v = _env(envVar, null);
-    return (v != null && v.isNotEmpty) ? v : fallback;
-  }
-
-  static Map<String, String> get defaultRoots => {
-        MediaCategory.music:  _dir('WATCH_MUSIC_ROOT',  '/mnt/nextcloud/house/files/media/music'),
-        MediaCategory.images: _dir('WATCH_IMAGES_ROOT', '/mnt/nextcloud/house/files/media/images'),
-        MediaCategory.shows:  _dir('WATCH_SHOWS_ROOT',  '/mnt/nextcloud/house/files/media/shows'),
-        MediaCategory.movies:  _dir('WATCH_MOVIES_ROOT', '/mnt/nextcloud/house/files/media/movies'),
-        MediaCategory.porn:   _dir('WATCH_PORN_ROOT',   '/mnt/nextcloud/house/files/media/porn'),
+  /// Hardcoded personal defaults. Consumers should use .env or Settings UI instead.
+  static Map<String, String> get _homeDefaults => {
+        MediaCategory.music:  '/mnt/nextcloud/house/files/media/music',
+        MediaCategory.images: '/mnt/nextcloud/house/files/media/images',
+        MediaCategory.shows:  '/mnt/nextcloud/house/files/media/shows',
+        MediaCategory.movies:  '/mnt/nextcloud/house/files/media/movies',
+        MediaCategory.porn:   '/mnt/nextcloud/house/files/media/porn',
       };
+
+  Map<String, String> get _defaultRoots {
+    return {
+      MediaCategory.music:  _envMap['WATCH_MUSIC_ROOT']  ?? _homeDefaults[MediaCategory.music]!,
+      MediaCategory.images: _envMap['WATCH_IMAGES_ROOT'] ?? _homeDefaults[MediaCategory.images]!,
+      MediaCategory.shows:  _envMap['WATCH_SHOWS_ROOT']  ?? _homeDefaults[MediaCategory.shows]!,
+      MediaCategory.movies:  _envMap['WATCH_MOVIES_ROOT'] ?? _homeDefaults[MediaCategory.movies]!,
+      MediaCategory.porn:   _envMap['WATCH_PORN_ROOT']   ?? _homeDefaults[MediaCategory.porn]!,
+    };
+  }
 
   Future<Map<String, String>> getMediaRoots() async {
     final prefs = await SharedPreferences.getInstance();
     final json = prefs.getString(_keyMediaRoots);
-    if (json == null) return Map.from(defaultRoots);
+    if (json == null) return Map.from(_defaultRoots);
     final Map<String, dynamic> raw = jsonDecode(json);
     return raw.map((k, v) => MapEntry(k, v as String));
   }
