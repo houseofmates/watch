@@ -1,129 +1,149 @@
-# watch — media server + player
+<h1 align="center">watch</h1>
 
-Flutter (3.41) app. Linux desktop, Android APK, Web — single codebase.
+<p align="center">
+  <strong>media server + player</strong><br>
+  flutter (3.41) app. linux desktop, android apk, web — single codebase.
+</p>
 
-## Quick start
+<p align="center">
+  <a href="#quick-start">quick start</a> •
+  <a href="#features">features</a> •
+  <a href="#architecture">architecture</a> •
+  <a href="#customise-media-paths">customise media paths</a> •
+  <a href="#notes">notes</a>
+</p>
 
-### Prerequisites
+<hr>
 
-- Flutter 3.41 SDK at `~/flutter-sdk` (exported to PATH)
-- All media files are read directly from disk — no transcoding
+<h2 align="center" id="quick-start">quick start</h2>
 
-### Default media roots
+<h3 align="center" id="prerequisites">prerequisites</h3>
 
-```
-/mnt/nextcloud/house/files/media/music
+- flutter 3.41 sdk at `~/flutter-sdk` (exported to path)
+- all media files are read directly from disk — no transcoding
+
+<h3 align="center" id="default-media-roots">default media roots</h3>
+
+<pre align="center"><code>/mnt/nextcloud/house/files/media/music
 /mnt/nextcloud/house/files/media/images
 /mnt/nextcloud/house/files/media/shows
 /mnt/nextcloud/house/files/media/movies
 /mnt/nextcloud/house/files/media/porn
-```
+</code></pre>
 
-All paths are configurable at runtime from Settings.
+<p align="center">all paths are configurable at runtime from settings.</p>
 
-### Build everything
+<h3 align="center" id="build-everything">build everything</h3>
 
-```bash
-export PATH="$HOME/flutter-sdk/bin:$PATH"
+<pre align="center"><code>export PATH="$HOME/flutter-sdk/bin:$PATH"
 ./build.sh
-```
+</code></pre>
 
-Artifacts land in `releases/`:
-- `releases/` — Linux bundle binaries
+<p align="center">artifacts land in <code>releases/</code>:</p>
+
+- `releases/` — linux bundle binaries
 - `releases/web/` — static web build
-- `releases/watch-release.apk` — signed debug APK
+- `releases/watch-release.apk` — signed debug apk
 
-### Run on Linux
+<h3 align="center" id="run-on-linux">run on linux</h3>
 
-```bash
-export PATH="$HOME/flutter-sdk/bin:$PATH"
+<pre align="center"><code>export PATH="$HOME/flutter-sdk/bin:$PATH"
 cd watch
 flutter run -d linux
-```
+</code></pre>
 
-### Install APK on Android
+<h3 align="center" id="install-apk-on-android">install apk on android</h3>
 
-```bash
-adb install releases/watch-release.apk
-# or drag-and-drop the APK into Android's file manager
-```
+<pre align="center"><code>adb install releases/watch-release.apk
+# or drag-and-drop the apk into android's file manager
+</code></pre>
 
-The APK is signed with the default debug key.
+<p align="center">the apk is signed with the default debug key.</p>
 
-### Run on Web
+<h3 align="center" id="run-on-web">run on web</h3>
 
-```bash
-cd build/web
+<pre align="center"><code>cd build/web
 python -m http.server 8080
 # open http://localhost:8080
-```
+</code></pre>
 
-Or deploy `build/web/` as static files to any web host / Cloudflare Pages / Nginx.
+<p align="center">or deploy <code>build/web/</code> as static files to any web host / cloudflare pages / nginx.</p>
 
-## Features
+<hr>
 
-| Tab | What it shows |
-|-----|--------------|
-| Home | Category summary grid |
-| Music | Albums → tracks, album art from `folder.jpg` |
-| Images | Photo albums → fullscreen viewer (swipe to flip) |
-| Shows | Series → Season → Episode |
-| movies | Per-film-series grid, standalone single files |
-| Adult | Configurable — toggled off by default with lock in Settings |
-| Search | Case-insensitive title search across all categories |
-| Settings | Porn toggle, light/dark/system theme, all 5 media root paths, rescan button |
+<h2 align="center" id="features">features</h2>
 
-### porn filter
+<div align="center">
+<table>
+  <thead>
+    <tr><th>tab</th><th>what it shows</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>home</td><td>category summary grid</td></tr>
+    <tr><td>music</td><td>albums → tracks, album art from <code>folder.jpg</code></td></tr>
+    <tr><td>images</td><td>photo albums → fullscreen viewer (swipe to flip)</td></tr>
+    <tr><td>shows</td><td>series → season → episode</td></tr>
+    <tr><td>movies</td><td>per-film-series grid, standalone single files</td></tr>
+    <tr><td>adult</td><td>configurable — toggled off by default with lock in settings</td></tr>
+    <tr><td>search</td><td>case-insensitive title search across all categories</td></tr>
+    <tr><td>settings</td><td>porn toggle, light/dark/system theme, all 5 media root paths, rescan button</td></tr>
+  </tbody>
+</table>
+</div>
 
-Toggled on/off from Settings. When disabled, the Adult tab is removed from nav
-and category is excluded from scan results. The toggle is always visible in
-Settings regardless.
+<h3 align="center" id="porn-filter">porn filter</h3>
 
-### folder conventions
+<p align="center">toggled on/off from settings. when disabled, the adult tab is removed from nav and category is excluded from scan results. the toggle is always visible in settings regardless.</p>
 
-- **Music** — top-level folders = album name; album art = `folder.jpg` /
-  `cover.png` inside each album folder
-- **Images** — top-level folders = album name; `thumb.jpg` as preview, else
-  first image
-- **Shows** — `Series Name/Season 01/Episode 01.mkv` (regex: `s\s*\d+`,
-  `ep\s*\d+` in filenames)
-- **Movies** — standalone video files at root = solo movie; sub-folders with
-  multiple videos = film series
-- **Adult** — studio folders or flat files; same video format support
+<h3 align="center" id="folder-conventions">folder conventions</h3>
 
+- **music** — top-level folders = album name; album art = `folder.jpg` / `cover.png` inside each album folder
+- **images** — top-level folders = album name; `thumb.jpg` as preview, else first image
+- **shows** — `series name/season 01/episode 01.mkv` (regex: `s\s*\d+`, `ep\s*\d+` in filenames)
+- **movies** — standalone video files at root = solo movie; sub-folders with multiple videos = film series
+- **adult** — studio folders or flat files; same video format support
 
-### supported formats
+<h3 align="center" id="supported-formats">supported formats</h3>
 
-audio `.mp3 .flac .wav .aac .ogg .m4a .wma .alac`
-video `.mp4 .mkv .avi .mov .webm .flv .wmv .m4v .ts`
-images `.jpg .jpeg .png .gif .bmp .webp .tiff .heic`
+<p align="center">audio <code>.mp3 .flac .wav .aac .ogg .m4a .wma .alac</code><br>
+video <code>.mp4 .mkv .avi .mov .webm .flv .wmv .m4v .ts</code><br>
+images <code>.jpg .jpeg .png .gif .bmp .webp .tiff .heic</code></p>
 
-## Architecture
+<hr>
 
-```
-lib/
+<h2 align="center" id="architecture">architecture</h2>
+
+<pre align="center"><code>lib/
   core/          constants, routes
-  models/        MediaItem, MediaGroup
-  services/      MediaScanner, SettingsRepo, Riverpod providers
+  models/        mediaitem, mediagroup
+  services/      mediascanner, settingsrepo, riverpod providers
   ui/
     screens/     all pages (home, music, images, shows, movies, adult,
                   search, settings, player, image-viewer)
-    widgets/     MediaCard grid tile, WatchShell adaptive nav
-  main.dart      ProviderScope → GoRouter → MaterialApp
-```
+    widgets/     mediacard grid tile, watchshell adaptive nav
+  main.dart      providerscope → gorouter → materialapp
+</code></pre>
 
-State: **Riverpod 2**. Navigation: **GoRouter**. Audio: **audioplayers 6**.
-Video: **chewie** on top of **video_player**. Images: **photo_view**.
+<p align="center">state: <strong>riverpod 2</strong>. navigation: <strong>gorouter</strong>. audio: <strong>audioplayers 6</strong>. video: <strong>chewie</strong> on top of <strong>video_player</strong>. images: <strong>photo_view</strong>.</p>
 
-## Customise media paths
+<hr>
 
-Open Settings → Media Roots → tap the folder icon on any row. Pick a
-directory. Settings are saved in SharedPreferences.
+<h2 align="center" id="customise-media-paths">customise media paths</h2>
 
-## Notes
+<p align="center">open settings → media roots → tap the folder icon on any row. pick a directory. settings are saved in sharedpreferences.</p>
 
-- No transcoding. Files are opened as-is.
-- Linux desktop reads /mnt/ paths directly — no file-picker restriction on
-  desktop; the picker falls back to a text field for custom paths.
-- APK is a release-signed debug build. For production signing, add keystore
-  config to `android/app/build.gradle`.
+<hr>
+
+<h2 align="center" id="notes">notes</h2>
+
+- no transcoding. files are opened as-is.
+- linux desktop reads /mnt/ paths directly — no file-picker restriction on desktop; the picker falls back to a text field for custom paths.
+- apk is a release-signed debug build. for production signing, add keystore config to `android/app/build.gradle`.
+
+<hr>
+
+<h2 align="center">license</h2>
+
+<div align="center">
+  <a href="./LICENSE">mates license</a>
+</div>
