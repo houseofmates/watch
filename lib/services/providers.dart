@@ -51,14 +51,25 @@ final filteredMediaProvider = Provider<AsyncValue<List<MediaItem>>>((ref) {
   });
 });
 
-/// Dart-define override for the jellyseerr API URL (used on native platforms).
-const _dartJellyseerrUrl = String.fromEnvironment('JELLYSEERR_API_URL');
+/// Dart-define overrides for jellyseerr (used on native platforms).
+const _dartJellyseerrUrl  = String.fromEnvironment('JELLYSEERR_API_URL');
+const _dartJellyseerrKey = String.fromEnvironment('JELLYSEERR_API_KEY');
 
 /// Jellyseerr API base URL — on web we proxy through the local watch server,
 /// on native we connect directly to the configured instance.
 final jellyseerrApiUrlProvider = Provider<String>((ref) {
   if (kIsWeb) return '/api/jellyseerr';
   return _dartJellyseerrUrl;
+});
+
+final jellyseerrApiKeyProvider = Provider<String>((ref) => _dartJellyseerrKey);
+
+/// A configured JellyseerrService for the current platform.
+final jellyseerrServiceProvider = Provider<JellyseerrService>((ref) {
+  return JellyseerrService.forPlatform(
+    nativeUrl: ref.watch(jellyseerrApiUrlProvider),
+    apiKey: ref.watch(jellyseerrApiKeyProvider),
+  );
 });
 
 /// Start polling /api/media-mtime on web (called once at app startup).
