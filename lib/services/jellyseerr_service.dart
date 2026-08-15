@@ -50,20 +50,41 @@ class JResult {
     final p = posterPath;
     if (p == null) return null;
     final cleanBase = baseUrl.endsWith('/') ? baseUrl.substring(0, baseUrl.length - 1) : baseUrl;
-    return '$cleanBase/img/t${p.startsWith('/') ? '' : '/'}${p.substring(1)}';
+    final pathPart = p.startsWith('/') ? p : '/$p';
+    return '$cleanBase/img/t$pathPart';
   }
 }
 
 class JellyseerrService {
-  final String baseUrl; // e.g. http://192.168.4.233:5052 or /api/jellyseerr
+  final String baseUrl; // e.g. http://192.168.4.233:5055 or /api/jellyseerr
   final String? apiKey;
+  final Map<String, String> _cookies = {};
 
   JellyseerrService({required this.baseUrl, this.apiKey});
 
   Map<String, String> get _headers {
     final h = {'Accept': 'application/json'};
     if (apiKey != null && apiKey!.isNotEmpty) h['Authorization'] = 'Bearer $apiKey';
+    if (_cookies.isNotEmpty) h['Cookie'] = _cookies.entries.map((e) => '${e.key}=${e.value}').join('; ');
     return h;
+  }
+
+  void _captureCookies(http.Response resp) {
+    final setCookie = resp.headers['set-cookie'];
+    if (setCookie == null) return;
+    // Parse Set-Cookie header (may contain multiple cookies)
+    for (final cookie in setCookie.split(',')) {
+      final parts = cookie.trim().split(';');
+      if (parts.isEmpty) continue;
+      final nv = parts[0].trim().split('=');
+      if (nv.length == 2) {
+        final name = nv[0].trim();
+        final value = nv[1].trim();
+        if (name.isNotEmpty && value.isNotEmpty && !name.toLowerCase().contains('expires')) {
+          _cookies[name] = value;
+        }
+      }
+    }
   }
 
   String _url(String path) {
@@ -76,48 +97,88 @@ class JellyseerrService {
     if (query.trim().isEmpty) return discover();
     final url = _url('/api/v1/search?query=${Uri.encodeQueryComponent(query)}&page=$page&pageSize=$pageSize');
     final resp = await http.get(Uri.parse(url), headers: _headers);
+    if (resp.statusCode == 401) return _handleUnauthorized();
     if (resp.statusCode != 200) throw Exception('jellyseerr search failed: ${resp.statusCode}');
-    final data = jsonDecode(resp.body) as Map<String, dynamic>;
-    final List<JResult> results = [];
-    final rawResults = data['results'] as List<dynamic>? ?? [];
-    for (final r in rawResults) {
-      final m = r as Map<String, dynamic>;
-      final mt = m['media_type'] as String? ?? m['type'] as String? ?? 'movie';
-      results.add(JResult.fromJson(m, mt));
-    }
-    return results;
+    _captureCookies(resp);
+    return _parseResults(jsonDecode(resp.body));
   }
 
   /// Discover popular movies + TV shows for the landing page.
   Future<List<JResult>> discover({int page = 1}) async {
     final List<JResult> results = [];
-    try {
-      // Popular movies
-      final mvUrl = _url('/api/v1/discover/movies?page=$page');
-      final mvResp = await http.get(Uri.parse(mvUrl), headers: _headers);
-      if (mvResp.statusCode == 200) {
-        final data = jsonDecode(mvResp.body) as Map<String, dynamic>;
+    for (final type in ['movie', 'tv']) {
+      final url = _url('/api/v1/discover/${type}s?page=$page');
+      try {
+        final resp = await http.get(Uri.parse(url), headers: _headers);
+        if (resp.statusCode == 401) return _handleUnauthorized();
+        if (resp.statusCode != 200) continue;
+        _captureCookies(resp);
+        final data = jsonDecode(resp.body) as Map<String, dynamic>;
         final raw = data['results'] as List<dynamic>? ?? [];
         for (final r in raw) {
           final m = r as Map<String, dynamic>;
-          results.add(JResult.fromJson(m, 'movie'));
+          results.add(JResult.fromJson(m, type));
         }
+      } catch (e) {
+        debugPrint('jellyseerr discover error: $e');
       }
-    } catch (_) {}
-    try {
-      // Popular TV
-      final tvUrl = _url('/api/v1/discover/tv?page=$page');
-      final tvResp = await http.get(Uri.parse(tvUrl), headers: _headers);
-      if (tvResp.statusCode == 200) {
-        final data = jsonDecode(tvResp.body) as Map<String, dynamic>;
-        final raw = data['results'] as List<dynamic>? ?? [];
-        for (final r in raw) {
-          final m = r as Map<String, dynamic>;
-          results.add(JResult.fromJson(m, 'tv'));
-        }
-      }
-    } catch (_) {}
+    }
     return results;
+  }
+
+  List<JResult> _parseResults(dynamic body) {
+    if (body is Map<String, dynamic>) {
+      final raw = body['results'] as List<dynamic>? ?? [];
+      return raw.map((r) => JResult.fromJson(r as Map<String, dynamic>, _guessType(r))).toList();
+    }
+    if (body is List) {
+      return body.map((r) => JResult.fromJson(r as Map<String, dynamic>, _guessType(r))).toList();
+    }
+    return [];
+  }
+
+  String _guessType(dynamic m) {
+    final mt = m['media_type'] ?? m['type'];
+    if (mt is String) return mt == 'tv' ? 'tv' : 'movie';
+    return m['title'] != null ? 'movie' : 'tv';
+  }
+
+  /// Returns empty list when unauthenticated — the UI will show a login prompt.
+  Future<List<JResult>> _handleUnauthorized() {
+    return Future.value([]);
+  }
+
+  /// Convenience: log in to jellyseerr via username/password.
+  /// Tries the common login endpoints.
+  Future<bool> login(String username, String password) async {
+    final candidates = [
+      '/api/v1/auth/login',
+      '/api/v1/auth/local/login',
+      '/api/v1/auth/signin',
+      '/api/v1/login',
+    ];
+    for (final path in candidates) {
+      final url = _url(path);
+      try {
+        final resp = await http.post(
+          Uri.parse(url),
+          headers: {'Content-Type': 'application/json', ..._headers},
+          body: jsonEncode({'username': username, 'password': password}),
+        );
+        _captureCookies(resp);
+        if (resp.statusCode == 200 || resp.statusCode == 201) return true;
+        if (resp.statusCode == 401) return false;
+      } catch (_) {}
+    }
+    return false;
+  }
+
+  /// Check if currently authenticated.
+  Future<bool> checkAuth() async {
+    final url = _url('/api/v1/user');
+    final resp = await http.get(Uri.parse(url), headers: _headers);
+    _captureCookies(resp);
+    return resp.statusCode == 200;
   }
 
   /// Convenience: create a service configured for this platform.
@@ -126,5 +187,10 @@ class JellyseerrService {
       return JellyseerrService(baseUrl: '/api/jellyseerr', apiKey: apiKey);
     }
     return JellyseerrService(baseUrl: nativeUrl ?? '', apiKey: apiKey);
+  }
+
+  static void debugPrint(Object? message) {
+    // ignore: avoid_print
+    print(message);
   }
 }
