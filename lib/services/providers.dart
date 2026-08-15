@@ -7,6 +7,7 @@ import '../core/constants.dart';
 import '../models/media_item.dart';
 import '../services/media_scanner.dart';
 import '../services/settings_repo.dart';
+import '../services/jellyseerr_service.dart';
 
 final themeModeProvider = FutureProvider<String>((ref) async {
   return await (await SettingsRepo.getInstance()).getThemeMode();
