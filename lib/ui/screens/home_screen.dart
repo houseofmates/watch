@@ -81,10 +81,6 @@ class _CategorySection extends ConsumerWidget {
                         onTap = () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => StudioVideoGrid(studioName: group.name, videos: group.items)),
                         );
-                      } else if (category == MediaCategory.images && group.items.isNotEmpty) {
-                        onTap = () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => ImageViewerScreen(path: group.items.first.path, title: group.name)),
-                        );
                       } else if (category == MediaCategory.shows && group.items.isNotEmpty) {
                         onTap = () {
                           final allItems = ref.read(filteredMediaProvider).value ?? [];
