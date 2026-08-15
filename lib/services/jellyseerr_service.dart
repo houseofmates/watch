@@ -111,7 +111,7 @@ class JellyseerrService {
       try {
         final resp = await http.get(Uri.parse(url), headers: _headers);
         if (resp.statusCode == 401) {
-          return _handleUnauthorized();
+          return await _handleUnauthorized();
         }
         if (resp.statusCode != 200) continue;
         _captureCookies(resp);
