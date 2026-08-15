@@ -376,7 +376,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   }
 
   Widget _imagePlaceholder(bool isMovie) => ColoredBox(
-        color: const Color(0xff1a1a3a),
+        color: Theme.of(context).cardColor,
         child: Center(child: Icon(isMovie ? Icons.movie : Icons.tv, size: 44, color: Colors.grey.shade600)),
       );
 }

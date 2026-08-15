@@ -57,8 +57,8 @@ class PornScreen extends ConsumerWidget {
 class _PornPlaceholder extends StatelessWidget {
   const _PornPlaceholder();
   @override
-  Widget build(BuildContext context) => const ColoredBox(
-    color: Color(0xff1a1a3a),
+  Widget build(BuildContext context) => ColoredBox(
+    color: Theme.of(context).cardColor,
     child: Center(child: Icon(Icons.lock, size: 44, color: Color(0xff3c9fdd))),
   );
 }
