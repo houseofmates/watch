@@ -2,7 +2,6 @@ class AppRoutes {
   static const String home = '/';
   static const String discover = '/discover';
   static const String music = '/music';
-  static const String images = '/images';
   static const String shows = '/shows';
   static const String movies = '/movies';
   static const String porn = '/porn';
@@ -15,12 +14,11 @@ class AppRoutes {
 class MediaCategory {
   static const String all = 'all';
   static const String music = 'music';
-  static const String images = 'images';
   static const String shows = 'shows';
   static const String movies = 'movies';
   static const String porn = 'porn';
   static const String discover = 'discover';
-  static const List<String> values = [all, discover, music, images, shows, movies, porn];
+  static const List<String> values = [all, discover, music, shows, movies, porn];
 }
 
 class MediaType {
