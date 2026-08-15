@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:watch/services/providers.dart';
+import 'package:watch/ui/screens/player_screen.dart';
 import 'package:watch/ui/screens/image_viewer_screen.dart';
 import 'package:watch/services/providers.dart';
 
