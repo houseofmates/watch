@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 import 'package:watch/core/constants.dart';
 import 'package:watch/models/media_item.dart';
@@ -10,6 +14,7 @@ class MediaScanner {
   MediaScanner({required this.mediaRoots, this.pornEnabled = true});
 
   Future<List<MediaItem>> scanAll() async {
+    if (kIsWeb) return _scanWeb();
     final List<MediaItem> all = [];
     for (final entry in mediaRoots.entries) {
       final category = entry.key;
@@ -21,6 +26,25 @@ class MediaScanner {
     }
     all.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     return all;
+  }
+
+  Future<List<MediaItem>> _scanWeb() async {
+    try {
+      final res = await http.get(Uri.parse('/api/media-list'));
+      if (res.statusCode != 200) return [];
+      final List<dynamic> raw = jsonDecode(res.body);
+      return raw
+          .where((m) {
+            final cat = m['category'] as String;
+            return cat != MediaCategory.music && !(cat == MediaCategory.porn && !pornEnabled);
+          })
+          .map<MediaItem>((m) => MediaItem.fromJson(m))
+          .toList()
+        ..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+    } catch (e) {
+      print('watch: web scan error: $e');
+      return [];
+    }
   }
 
   Future<List<MediaItem>> _scanCategory(String category, String root) async {
@@ -202,14 +226,14 @@ class MediaScanner {
 
   // ── helpers ────────────────────────────────────────────────────────────
   Stream<Directory> _dirs(String path) async* {
-    await for (final e in Directory(path).list(followLinks: false).cast<Directory>()) {
-      yield e;
+    await for (final e in Directory(path).list(followLinks: false)) {
+      if (e is Directory) yield e;
     }
   }
 
   Stream<File> _files(String path) async* {
-    await for (final e in Directory(path).list(followLinks: false).cast<File>()) {
-      yield e;
+    await for (final e in Directory(path).list(followLinks: false)) {
+      if (e is File) yield e;
     }
   }
 
