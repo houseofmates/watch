@@ -110,7 +110,9 @@ class JellyseerrService {
       final url = _url('/api/v1/discover/${type}s?page=$page');
       try {
         final resp = await http.get(Uri.parse(url), headers: _headers);
-        if (resp.statusCode == 401) return _handleUnauthorized();
+        if (resp.statusCode == 401) {
+          return _handleUnauthorized();
+        }
         if (resp.statusCode != 200) continue;
         _captureCookies(resp);
         final data = jsonDecode(resp.body) as Map<String, dynamic>;
