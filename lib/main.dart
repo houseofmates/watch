@@ -50,13 +50,35 @@ class WatchApp extends ConsumerWidget {
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
-        colorSchemeSeed: const Color(0xff6c5ce7),
-        scaffoldBackgroundColor: const Color(0xff0a0a1a),
-        cardColor: const Color(0xff13132a),
-        appBarTheme: const AppBarTheme(backgroundColor: Color(0xff13132a), elevation: 0),
-        navigationBarTheme: const NavigationBarThemeData(backgroundColor: Color(0xff13132a), indicatorColor: Color(0xff6c5ce7)),
-        navigationRailTheme: const NavigationRailThemeData(backgroundColor: Color(0xff13132a), indicatorColor: Color(0xff6c5ce7)),
-        dividerTheme: DividerThemeData(color: Colors.grey.shade800),
+        fontFamily: 'VarelaRound',
+        colorScheme: ColorScheme.dark(
+          primary: const Color(0xffffaf00),
+          secondary: const Color(0xff3c9fdd),
+          surface: const Color(0xff050505),
+          onSurface: const Color(0xffe0e0e0),
+          onPrimary: const Color(0xff050505),
+        ),
+        scaffoldBackgroundColor: const Color(0xff050505),
+        cardColor: const Color(0xff0a0a0a),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xff050505),
+          foregroundColor: Color(0xffffaf00),
+          elevation: 0,
+        ),
+        navigationBarTheme: const NavigationBarThemeData(
+          backgroundColor: Color(0xff050505),
+          indicatorColor: Color(0xffffaf00),
+        ),
+        navigationRailTheme: const NavigationRailThemeData(
+          backgroundColor: Color(0xff050505),
+          indicatorColor: Color(0xffffaf00),
+        ),
+        dividerTheme: const DividerThemeData(color: Color(0xff1a1a1a)),
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(color: Color(0xffe0e0e0)),
+          bodyMedium: TextStyle(color: Color(0xffe0e0e0)),
+          bodySmall: TextStyle(color: Color(0xffa0a0a0)),
+        ),
       ),
       themeMode: themeModeAsync.when(
         data: (m) => m == 'light' ? ThemeMode.light : m == 'dark' ? ThemeMode.dark : ThemeMode.system,
