@@ -58,5 +58,5 @@ class ImagesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _placeholder() => Container(color: const Color(0xff1a1a3a), child: const Icon(Icons.photo, size: 40, color: Color(0xff3c9fdd)));
+  Widget _placeholder() => Container(color: Theme.of(context).cardColor, child: const Icon(Icons.photo, size: 40, color: Color(0xff3c9fdd)));
 }
