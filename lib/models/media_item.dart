@@ -48,7 +48,7 @@ class MediaItem {
     return null;
   }
 
-  static int? _intOrNull(dynamic v, {int sentinel = -1}) {
+  static int? _intOrNull(dynamic v) {
     if (v is int) return v >= 0 ? v : null;
     return null;
   }
