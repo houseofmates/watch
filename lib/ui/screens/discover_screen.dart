@@ -249,7 +249,6 @@ class _DetailSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isMovie = item.mediaType == 'movie';
     final placeholder = Container(color: Colors.grey.shade800, child: const Center(child: Icon(Icons.movie, size: 48)));
 
     return DraggableScrollableSheet(
@@ -291,7 +290,7 @@ class _DetailSheet extends StatelessWidget {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(item.title, style: Theme.of(context).textTheme.titleLarge),
                     const SizedBox(height: 4),
-                    Text('${item.releaseDate ?? '?'} · ${isMovie ? 'movie' : 'tv show'}',
+                    Text('${item.releaseDate ?? '?'} · ${item.mediaType == 'movie' ? 'movie' : 'tv show'}',
                         style: TextStyle(color: Colors.grey.shade500, fontSize: 13)),
                     if (item.rating != null)
                       Row(children: [
