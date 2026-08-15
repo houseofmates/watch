@@ -1,9 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:watch/services/providers.dart';
 import 'package:watch/ui/screens/home_screen.dart';
+import 'package:watch/ui/screens/discover_screen.dart';
 import 'package:watch/ui/screens/music_screen.dart';
 import 'package:watch/ui/screens/images_screen.dart';
 import 'package:watch/ui/screens/shows_screen.dart';
@@ -18,6 +18,7 @@ final _router = GoRouter(
   initialLocation: '/',
   routes: [
     GoRoute(path: '/', builder: (_, __) => _Root(child: HomeScreen())),
+    GoRoute(path: '/discover', builder: (_, __) => _Root(child: DiscoverScreen())),
     GoRoute(path: '/music', builder: (_, __) => _Root(child: MusicScreen())),
     GoRoute(path: '/images', builder: (_, __) => _Root(child: ImagesScreen())),
     GoRoute(path: '/shows', builder: (_, __) => _Root(child: ShowsScreen())),

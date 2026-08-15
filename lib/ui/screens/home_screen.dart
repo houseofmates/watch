@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,8 +5,8 @@ import 'package:watch/core/constants.dart';
 import 'package:watch/models/media_item.dart';
 import 'package:watch/services/providers.dart';
 import 'package:watch/ui/screens/image_viewer_screen.dart';
-import 'package:watch/ui/screens/movies_screen.dart';
 import 'package:watch/ui/screens/porn_screen.dart';
+import 'package:watch/ui/screens/movies_screen.dart';
 import 'package:watch/ui/screens/shows_screen.dart';
 import 'package:watch/ui/widgets/media_card.dart';
 
@@ -17,12 +16,15 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final pornEnabled = ref.watch(pornToggleProvider);
     final categories = MediaCategory.values.where(
-      (c) => c != MediaCategory.all && (c != MediaCategory.porn || pornEnabled),
+      (c) => c != MediaCategory.all && c != MediaCategory.discover && (c != MediaCategory.porn || pornEnabled),
     ).toList();
     return Scaffold(
       appBar: AppBar(
         title: const Text('watch'),
-        actions: [IconButton(icon: const Icon(Icons.search), onPressed: () => context.push('/search'))],
+        actions: [
+          IconButton(icon: const Icon(Icons.search), onPressed: () => context.push('/search')),
+          IconButton(icon: const Icon(Icons.explore), onPressed: () => context.push('/discover')),
+        ],
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(12),
@@ -39,8 +41,8 @@ class _CategorySection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final groupsAsync = ref.watch(filteredMediaProvider).whenData(
-      (items) => groupMedia(items.where((m) => m.category == category).toList(), category),
-    );
+          (items) => groupMedia(items.where((m) => m.category == category).toList(), category),
+        );
     final catIcon = {
       'music': Icons.music_note,
       'images': Icons.photo_library,
@@ -54,7 +56,7 @@ class _CategorySection extends ConsumerWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
           child: Row(children: [
-            Icon(catIcon[category], size: 20),
+            Icon(catIcon[category] ?? Icons.folder, size: 20),
             const SizedBox(width: 8),
             Text(category.toUpperCase(), style: Theme.of(context).textTheme.titleLarge),
             const Spacer(),
