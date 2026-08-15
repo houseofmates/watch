@@ -57,7 +57,7 @@ class JResult {
 
 class JellyseerrService {
   final String baseUrl; // e.g. http://192.168.4.233:5055 or /api/jellyseerr
-  final String? apiKey;
+  String? apiKey;
   final Map<String, String> _cookies = {};
 
   JellyseerrService({required this.baseUrl, this.apiKey});
