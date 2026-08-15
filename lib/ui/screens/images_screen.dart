@@ -1,7 +1,7 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:watch/core/constants.dart';
 import 'package:watch/models/media_item.dart';
 import 'package:watch/ui/screens/player_screen.dart';
@@ -38,8 +38,10 @@ class ImagesScreen extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: e.value.first.albumArtPath != null
-                            ? Image.file(File(e.value.first.albumArtPath!), fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(color: Colors.grey[800], child: const Icon(Icons.broken_image)))
-                            : Container(color: Colors.grey[800], child: const Icon(Icons.photo, size: 40)),
+                            ? (kIsWeb
+                                ? Image.network(e.value.first.albumArtPath!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => _placeholder())
+                                : Image.file(File(e.value.first.albumArtPath!), fit: BoxFit.cover, errorBuilder: (_, __, ___) => _placeholder()))
+                            : _placeholder(),
                       ),
                       Padding(padding: const EdgeInsets.all(4), child: Text(e.key, maxLines: 1, overflow: TextOverflow.ellipsis)),
                     ],
@@ -54,4 +56,6 @@ class ImagesScreen extends ConsumerWidget {
       ),
     );
   }
+
+  Widget _placeholder() => Container(color: const Color(0xff1a1a3a), child: const Icon(Icons.photo, size: 40, color: Color(0xff3c9fdd)));
 }

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:watch/core/constants.dart';
@@ -30,7 +31,11 @@ class MusicScreen extends ConsumerWidget {
                   leading: ClipRRect(
                     borderRadius: BorderRadius.circular(6),
                     child: e.value.first.albumArtPath != null
-                        ? Image.file(File(e.value.first.albumArtPath!), width: 56, height: 56, fit: BoxFit.cover)
+                        ? (kIsWeb
+                            ? Image.network(e.value.first.albumArtPath!, width: 56, height: 56, fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => const Icon(Icons.album, size: 56))
+                            : Image.file(File(e.value.first.albumArtPath!), width: 56, height: 56, fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => const Icon(Icons.album, size: 56)))
                         : const Icon(Icons.album, size: 56),
                   ),
                   title: Text(e.key ?? 'unknown', maxLines: 1, overflow: TextOverflow.ellipsis),
