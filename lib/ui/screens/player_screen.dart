@@ -75,8 +75,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     int? pos;
     int? dur;
     if (_audio != null) {
-      pos = await _audio!.getCurrentPosition();
-      final d = _audio!.duration;
+      final cp = await _audio!.getCurrentPosition();
+      pos = cp?.inMilliseconds;
+      final d = await _audio!.getDuration();
       dur = d?.inMilliseconds;
       if (pos != null && pos > 0) {
         await PlaybackStateRepo.savePosition(
