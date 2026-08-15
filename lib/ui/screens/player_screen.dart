@@ -42,7 +42,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
         setState(() {});
       });
       _audio!.onPositionChanged.listen((_) => _autoSave());
-      _savedMs = await _audio!.getCurrentPosition();
+      final cp = await _audio!.getCurrentPosition();
+      _savedMs = cp?.inMilliseconds;
       if (_savedMs == null || _savedMs! < 1000) {
         _savedMs = await PlaybackStateRepo.getPosition(widget.mediaItem.path);
       }
