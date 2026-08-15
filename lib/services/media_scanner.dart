@@ -50,7 +50,6 @@ class MediaScanner {
   Future<List<MediaItem>> _scanCategory(String category, String root) async {
     switch (category) {
       case MediaCategory.music: return _scanMusic(root);
-      case MediaCategory.images: return _scanImages(root);
       case MediaCategory.shows: return _scanShows(root);
       case MediaCategory.movies: return _scanMovies(root);
       case MediaCategory.porn: return _scanPorn(root);

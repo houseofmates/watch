@@ -43,17 +43,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             itemCount: hits.length,
             itemBuilder: (_, i) {
               final m = hits[i];
-              final iconData = m.type == MediaType.audio ? Icons.music_note : m.type == MediaType.image ? Icons.image : Icons.videocam;
+              final iconData = m.type == MediaType.audio ? Icons.music_note : Icons.videocam;
               return ListTile(
                 leading: Icon(iconData),
                 title: Text(m.title),
                 subtitle: Text(m.seriesName ?? m.path.split('/').last),
                 onTap: () {
-                  if (m.type == MediaType.image) {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => ImageViewerScreen(path: m.path, title: m.title)));
-                  } else {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => PlayerScreen(mediaItem: m)));
-                  }
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => PlayerScreen(mediaItem: m)));
                 },
               );
             },
