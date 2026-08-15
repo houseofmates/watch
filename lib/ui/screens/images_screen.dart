@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_view/photo_view.dart';
@@ -38,8 +39,15 @@ class ImagesScreen extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: e.value.first.albumArtPath != null
+<<<<<<< Updated upstream
                             ? Image.file(File(e.value.first.albumArtPath!), fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(color: Colors.grey[800], child: const Icon(Icons.broken_image)))
                             : Container(color: Colors.grey[800], child: const Icon(Icons.photo, size: 40)),
+=======
+                            ? (kIsWeb
+                                ? Image.network(e.value.first.albumArtPath!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(color: const Color(0xff000000), child: const Icon(Icons.broken_image, color: Color(0xff3c9fdd))))
+                                : Image.file(File(e.value.first.albumArtPath!), fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(color: const Color(0xff000000), child: const Icon(Icons.broken_image, color: Color(0xff3c9fdd)))))
+                            : Container(color: const Color(0xff000000), child: const Icon(Icons.photo, size: 40, color: Color(0xff3c9fdd))),
+>>>>>>> Stashed changes
                       ),
                       Padding(padding: const EdgeInsets.all(4), child: Text(e.key, maxLines: 1, overflow: TextOverflow.ellipsis)),
                     ],

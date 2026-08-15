@@ -3,7 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:watch/core/constants.dart';
+import 'package:watch/models/media_item.dart';
 import 'package:watch/services/providers.dart';
+import 'package:watch/ui/screens/image_viewer_screen.dart';
+import 'package:watch/ui/screens/movies_screen.dart';
+import 'package:watch/ui/screens/porn_screen.dart';
+import 'package:watch/ui/screens/shows_screen.dart';
 import 'package:watch/ui/widgets/media_card.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -65,10 +70,43 @@ class _CategorySection extends ConsumerWidget {
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     itemCount: groups.length,
-                    itemBuilder: (_, j) => Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: MediaCard(group: groups[j]),
-                    ),
+                    itemBuilder: (_, j) {
+                      final group = groups[j];
+                      VoidCallback? onTap;
+                      if (category == MediaCategory.movies) {
+                        onTap = () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => MovieListScreen(groupName: group.name, movies: group.items)),
+                        );
+                      } else if (category == MediaCategory.porn) {
+                        onTap = () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => StudioVideoGrid(studioName: group.name, videos: group.items)),
+                        );
+                      } else if (category == MediaCategory.images && group.items.isNotEmpty) {
+                        onTap = () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => ImageViewerScreen(path: group.items.first.path, title: group.name)),
+                        );
+                      } else if (category == MediaCategory.shows && group.items.isNotEmpty) {
+                        onTap = () {
+                          final allItems = ref.read(filteredMediaProvider).value ?? [];
+                          final Map<String, List<MediaItem>> seasons = {};
+                          for (final m in allItems) {
+                            if (m.category == MediaCategory.shows && m.seriesName == group.name) {
+                              final ss = m.season ?? 'unknown';
+                              seasons.putIfAbsent(ss, () => []).add(m);
+                            }
+                          }
+                          if (seasons.isNotEmpty) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (_) => SeasonGrid(showName: group.name, seasons: seasons)),
+                            );
+                          }
+                        };
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: MediaCard(group: group, onTap: onTap),
+                      );
+                    },
                   ),
                 ),
           loading: () => const SizedBox(height: 240, child: Center(child: CircularProgressIndicator())),

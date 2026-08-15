@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 
@@ -12,7 +13,7 @@ class ImageViewerScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       body: PhotoView(
-        imageProvider: FileImage(File(path)),
+        imageProvider: kIsWeb ? NetworkImage(path) : FileImage(File(path)) as ImageProvider,
         backgroundDecoration: const BoxDecoration(color: Colors.black),
       ),
     );

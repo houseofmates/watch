@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 import '../core/constants.dart';
 import '../models/media_item.dart';
 import '../services/media_scanner.dart';
@@ -23,13 +27,38 @@ final mediaRootsProvider = FutureProvider<Map<String, String>>((ref) async {
   return await (await SettingsRepo.getInstance()).getMediaRoots();
 });
 
+final mediaMtimeProvider = StateProvider<double>((ref) => 0.0);
+
 final allMediaProvider = FutureProvider<List<MediaItem>>((ref) async {
+  ref.watch(mediaMtimeProvider);
   final roots = await ref.watch(mediaRootsProvider.future);
   final pornEnabled = ref.watch(pornToggleProvider);
   if (roots.isEmpty) return [];
   final scanner = MediaScanner(mediaRoots: roots, pornEnabled: pornEnabled);
   return await scanner.scanAll();
 });
+
+/// Start polling /api/media-mtime on web (called once at app startup).
+Timer? _mtimePoller;
+void startMediaWatcher(WidgetRef ref) {
+  if (!kIsWeb || _mtimePoller != null) return;
+  _mtimePoller = Timer.periodic(const Duration(seconds: 15), (_) async {
+    try {
+      final res = await http.get(Uri.parse('/api/media-mtime'));
+      if (res.statusCode != 200) return;
+      final data = jsonDecode(res.body) as Map<String, dynamic>;
+      final mtime = (data['mtime'] as num).toDouble();
+      if (mtime > ref.read(mediaMtimeProvider)) {
+        ref.read(mediaMtimeProvider.notifier).state = mtime;
+      }
+    } catch (_) {}
+  });
+}
+
+void stopMediaWatcher() {
+  _mtimePoller?.cancel();
+  _mtimePoller = null;
+}
 
 final categoryProvider = StateProvider<String>((ref) => MediaCategory.all);
 

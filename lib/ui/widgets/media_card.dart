@@ -1,17 +1,20 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:watch/core/constants.dart';
 import 'package:watch/models/media_item.dart';
+import 'package:watch/ui/widgets/watched_progress_bar.dart';
 
 class MediaCard extends StatelessWidget {
   final MediaGroup group;
-  const MediaCard({super.key, required this.group});
+  final VoidCallback? onTap;
+  const MediaCard({super.key, required this.group, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
+      onTap: onTap ?? () {
         final route = {
           MediaCategory.music: '/music',
           MediaCategory.images: '/images',
@@ -56,10 +59,31 @@ class _Cover extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cover = group.coverArtPath;
+    Widget image;
     if (cover != null && cover.isNotEmpty) {
-      return Image.file(File(cover), fit: BoxFit.cover, errorBuilder: (_, __, ___) => _Icon(group.category));
+      if (kIsWeb) {
+        image = Image.network(cover, fit: BoxFit.cover, errorBuilder: (_, __, ___) => _Icon(group.category));
+      } else {
+        image = Image.file(File(cover), fit: BoxFit.cover, errorBuilder: (_, __, ___) => _Icon(group.category));
+      }
+    } else {
+      image = _Icon(group.category);
     }
-    return _Icon(group.category);
+    final fp = _firstVideoPath;
+    if (fp == null) return image;
+    return Stack(
+      children: [
+        image,
+        Positioned(left: 0, right: 0, bottom: 0, child: WatchedProgressBar(filePath: fp)),
+      ],
+    );
+  }
+
+  String? get _firstVideoPath {
+    for (final item in group.items) {
+      if (item.type == MediaType.video) return item.path;
+    }
+    return null;
   }
 }
 

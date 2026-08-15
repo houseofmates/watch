@@ -31,12 +31,63 @@ final _router = GoRouter(
   ],
 );
 
+<<<<<<< Updated upstream
 class _Root extends ConsumerWidget {
   final Widget child;
   const _Root({required this.child});
   @override
   Widget build(BuildContext context, WidgetRef ref) => WatchShell(child: child);
 }
+=======
+final _darkTheme = ThemeData(
+  useMaterial3: true,
+  brightness: Brightness.dark,
+  colorScheme: const ColorScheme.dark(
+    surface: Color(0xff050505),
+    primary: Color(0xfff6b012),
+    secondary: Color(0xff3c9fdd),
+    onSurface: Color(0xffffffff),
+    onPrimary: Color(0xff050505),
+    onSecondary: Color(0xff050505),
+  ),
+  scaffoldBackgroundColor: const Color(0xff050505),
+  canvasColor: const Color(0xff050505),
+  cardColor: const Color(0xff000000),
+  dividerTheme: const DividerThemeData(color: Color(0xff1a1a1a)),
+  textSelectionTheme: const TextSelectionThemeData(cursorColor: Color(0xfff6b012)),
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Color(0xff050505),
+    elevation: 0,
+    titleTextStyle: TextStyle(color: Color(0xfff6b012), fontSize: 18, fontFamily: 'VarelaRound'),
+    iconTheme: IconThemeData(color: Color(0xfff6b012)),
+  ),
+  navigationBarTheme: NavigationBarThemeData(
+    backgroundColor: const Color(0xff000000),
+    indicatorColor: const Color(0xfff6b012),
+    labelTextStyle: WidgetStateProperty.resolveWith((_) =>
+        const TextStyle(fontFamily: 'VarelaRound', fontSize: 12, color: Color(0xffffffff))),
+    iconTheme: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
+        return const IconThemeData(color: Color(0xff050505));
+      }
+      return const IconThemeData(color: Color(0xff3c9fdd));
+    }),
+  ),
+  navigationRailTheme: const NavigationRailThemeData(
+    backgroundColor: Color(0xff000000),
+    indicatorColor: Color(0xfff6b012),
+    unselectedLabelTextStyle: TextStyle(fontFamily: 'VarelaRound', fontSize: 10, color: Color(0xffffffff)),
+    selectedLabelTextStyle: TextStyle(fontFamily: 'VarelaRound', fontSize: 10, color: Color(0xffffffff)),
+    selectedIconTheme: IconThemeData(color: Color(0xff050505)),
+    unselectedIconTheme: IconThemeData(color: Color(0xff3c9fdd)),
+  ),
+  textTheme: ThemeData.dark().textTheme.apply(
+    fontFamily: 'VarelaRound',
+    bodyColor: const Color(0xffffffff),
+    displayColor: const Color(0xfff6b012),
+  ),
+);
+>>>>>>> Stashed changes
 
 class WatchApp extends ConsumerWidget {
   const WatchApp({super.key});

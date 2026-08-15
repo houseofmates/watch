@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:watch/core/constants.dart';
@@ -50,6 +51,93 @@ class MusicScreen extends ConsumerWidget {
   }
 }
 
+<<<<<<< Updated upstream
+=======
+class _SortDropdown extends ConsumerWidget {
+  const _SortDropdown();
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mode = ref.watch(sortModeProvider);
+    return PopupMenuButton<String>(
+      icon: const Icon(Icons.sort),
+      tooltip: 'sort by',
+      initialValue: mode,
+      onSelected: (v) => ref.read(sortModeProvider.notifier).state = v,
+      itemBuilder: (_) => _sortOptions.map((o) => PopupMenuItem(value: o.$1, child: Text(o.$2))).toList(),
+    );
+  }
+}
+
+class _AlbumsGrid extends ConsumerWidget {
+  final Map<String?, List<MediaItem>> albums;
+  const _AlbumsGrid({required this.albums});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final sortMode = ref.watch(sortModeProvider);
+    final w = MediaQuery.of(context).size.width;
+    final cols = w < 600 ? 2 : w < 1024 ? 3 : 4;
+    final groups = albums.entries.map((e) => MediaGroup(
+      name: e.key ?? 'unknown', category: MediaCategory.music,
+      coverArtPath: e.value.first.albumArtPath, items: e.value,
+    )).toList();
+    final sorted = sortGroups(groups, sortMode);
+    return GridView.builder(
+      padding: const EdgeInsets.all(12),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: cols, crossAxisSpacing: 8, mainAxisSpacing: 8,
+      ),
+      itemCount: sorted.length,
+      itemBuilder: (_, i) {
+        final group = sorted[i];
+        return GestureDetector(
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => _TrackList(albumName: group.name, tracks: group.items)),
+          ),
+          child: Card(
+            clipBehavior: Clip.hardEdge,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: group.coverArtPath != null
+                      ? (kIsWeb
+                          ? Image.network(group.coverArtPath!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const _AlbumPlaceholder())
+                          : Image.file(File(group.coverArtPath!), fit: BoxFit.cover, errorBuilder: (_, __, ___) => const _AlbumPlaceholder()))
+                      : const _AlbumPlaceholder(),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                  color: Theme.of(context).cardColor,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(group.name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Text(group.items.first.subtitle.isEmpty ? '${group.itemCount} tracks' : group.items.first.subtitle,
+                          style: const TextStyle(color: Color(0xff3c9fdd), fontSize: 11)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _AlbumPlaceholder extends StatelessWidget {
+  const _AlbumPlaceholder();
+  @override
+  Widget build(BuildContext context) => const ColoredBox(
+    color: Color(0xff1a1a3a),
+    child: Center(child: Icon(Icons.album, size: 44, color: Color(0xff3c9fdd))),
+  );
+}
+
+>>>>>>> Stashed changes
 class _TrackList extends StatelessWidget {
   final String albumName;
   final List<MediaItem> tracks;
