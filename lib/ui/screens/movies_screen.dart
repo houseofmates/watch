@@ -72,7 +72,7 @@ class MoviesScreen extends ConsumerWidget {
   );
 }
 
-Widget _moviePlaceholder() => Container(color: const Color(0xff1a1a3a), child: const Center(child: Icon(Icons.movie, size: 44, color: Color(0xff3c9fdd))));
+Widget _moviePlaceholder() => Container(color: const Color(0xff0a0a0a), child: const Center(child: Icon(Icons.movie, size: 44, color: Color(0xff3c9fdd))));
 
 class MovieListScreen extends StatelessWidget {
   final String groupName;

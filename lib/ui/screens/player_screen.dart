@@ -125,7 +125,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.music_note, size: 80, color: Colors.deepPurple),
+                      const Icon(Icons.music_note, size: 80, color: Color(0xff3c9fdd)),
                       const SizedBox(height: 16),
                       Text(widget.mediaItem.title, textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.headlineSmall),

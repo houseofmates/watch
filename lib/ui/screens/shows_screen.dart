@@ -58,7 +58,7 @@ class _ShowPlaceholder extends StatelessWidget {
   const _ShowPlaceholder();
   @override
   Widget build(BuildContext context) => const ColoredBox(
-    color: Color(0xff1a1a3a),
+    color: const Color(0xff0a0a0a),
     child: Center(child: Icon(Icons.tv, size: 44, color: Color(0xff3c9fdd))),
   );
 }

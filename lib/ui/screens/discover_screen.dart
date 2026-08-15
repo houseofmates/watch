@@ -100,7 +100,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     } else {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('cannot open $url'), backgroundColor: Colors.red.shade900),
+        SnackBar(content: Text('cannot open $url'), backgroundColor: Theme.of(context).colorScheme.primary),
       );
     }
   }
@@ -146,7 +146,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               } else {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: const Text('login failed'), backgroundColor: Colors.red.shade900),
+                    SnackBar(content: const Text('login failed'), backgroundColor: Theme.of(context).colorScheme.primary),
                   );
                 }
               }
