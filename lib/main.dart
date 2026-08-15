@@ -19,7 +19,6 @@ final _router = GoRouter(
     GoRoute(path: '/', builder: (_, __) => _Root(child: HomeScreen())),
     GoRoute(path: '/discover', builder: (_, __) => _Root(child: DiscoverScreen())),
     GoRoute(path: '/music', builder: (_, __) => _Root(child: MusicScreen())),
-    GoRoute(path: '/images', builder: (_, __) => _Root(child: ImagesScreen())),
     GoRoute(path: '/shows', builder: (_, __) => _Root(child: ShowsScreen())),
     GoRoute(path: '/movies', builder: (_, __) => _Root(child: MoviesScreen())),
     GoRoute(path: '/search', builder: (_, __) => _Root(child: SearchScreen())),
