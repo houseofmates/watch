@@ -43,6 +43,16 @@ class MediaItem {
         fileSizeBytes: 0, modified: DateTime(0), extension: '',
       );
 
+  static String? _strOrNull(dynamic v) {
+    if (v is String) return v.isNotEmpty ? v : null;
+    return null;
+  }
+
+  static int? _intOrNull(dynamic v, {int sentinel = -1}) {
+    if (v is int) return v >= 0 ? v : null;
+    return null;
+  }
+
   Map<String, dynamic> toMap() => {'path': path, 'category': category, 'type': type, 'title': title,
     'seriesName': seriesName ?? '', 'season': season ?? '', 'seasonNumber': seasonNumber ?? -1,
     'episodeNumber': episodeNumber ?? -1, 'albumArtPath': albumArtPath ?? '',
@@ -52,18 +62,21 @@ class MediaItem {
   };
 
   static MediaItem fromMap(Map<String, dynamic> m) => MediaItem(
-    path: m['path'] as String, category: m['category'] as String, type: m['type'] as String,
+    path: m['path'] as String,
+    category: m['category'] as String,
+    type: m['type'] as String,
     title: m['title'] as String,
-    seriesName: (m['seriesName'] as String?)?.isNotEmpty == true ? m['seriesName'] as String? : null,
-    season: (m['season'] as String?)?.isNotEmpty == true ? m['season'] as String? : null,
-    seasonNumber: (m['seasonNumber'] as int?)? >= 0 ? m['seasonNumber'] as int? : null,
-    episodeNumber: (m['episodeNumber'] as int?)? >= 0 ? m['episodeNumber'] as int? : null,
-    albumArtPath: (m['albumArtPath'] as String?)?.isNotEmpty == true ? m['albumArtPath'] as String? : null,
-    fileSizeBytes: m['fileSizeBytes'] as int, modified: DateTime.parse(m['modified'] as String),
-    extension: m['extension'] as String,
-    durationSeconds: m['durationSeconds'] as int? == (m['durationSeconds'] as int? ?? -1) ? (m['durationSeconds'] as int? ?? -1) : null,
-    thumbnailPath: (m['thumbnailPath'] as String?)?.isNotEmpty == true ? m['thumbnailPath'] as String? : null,
-    subtitle: (m['subtitle'] as String?)?.isNotEmpty == true ? m['subtitle'] as String? : null,
+    seriesName: _strOrNull(m['seriesName']),
+    season: _strOrNull(m['season']),
+    seasonNumber: _intOrNull(m['seasonNumber']),
+    episodeNumber: _intOrNull(m['episodeNumber']),
+    albumArtPath: _strOrNull(m['albumArtPath']),
+    fileSizeBytes: m['fileSizeBytes'] as int? ?? 0,
+    modified: DateTime.parse((m['modified'] as String? ?? DateTime(0).toIso8601String())),
+    extension: m['extension'] as String? ?? '',
+    durationSeconds: _intOrNull(m['durationSeconds']),
+    thumbnailPath: _strOrNull(m['thumbnailPath']),
+    subtitle: _strOrNull(m['subtitle']),
   );
 
   /// For web scanning: build from the JSON returned by the watch server /api/media-list
