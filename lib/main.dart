@@ -5,7 +5,6 @@ import 'package:watch/services/providers.dart';
 import 'package:watch/ui/screens/home_screen.dart';
 import 'package:watch/ui/screens/discover_screen.dart';
 import 'package:watch/ui/screens/music_screen.dart';
-import 'package:watch/ui/screens/images_screen.dart';
 import 'package:watch/ui/screens/shows_screen.dart';
 import 'package:watch/ui/screens/movies_screen.dart';
 import 'package:watch/ui/screens/porn_screen.dart';
