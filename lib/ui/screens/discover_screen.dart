@@ -98,6 +98,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('cannot open $url'), backgroundColor: Colors.red.shade900),
       );
@@ -136,14 +137,18 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               final svc = ref.read(jellyseerrServiceProvider);
               final ok = await svc.login(emailCtrl.text.trim(), passCtrl.text);
               if (ok) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('logged in'), backgroundColor: Colors.green),
-                );
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('logged in'), backgroundColor: Colors.green),
+                  );
+                }
                 _retry();
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('login failed'), backgroundColor: Colors.red.shade900),
-                );
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: const Text('login failed'), backgroundColor: Colors.red.shade900),
+                  );
+                }
               }
             },
             child: const Text('login'),
