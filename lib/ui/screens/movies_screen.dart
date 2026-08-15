@@ -34,7 +34,7 @@ class MoviesScreen extends ConsumerWidget {
             itemBuilder: (_, i) {
               final e = groups.entries.elementAt(i);
               final group = MediaGroup(name: e.key ?? 'Standalone', category: MediaCategory.movies, items: e.value);
-              return _MovieCard(context, group, cols);
+              return _buildMovieCard(context, group, cols);
             },
           );
         },
