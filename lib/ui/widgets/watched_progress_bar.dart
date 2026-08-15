@@ -15,7 +15,7 @@ class WatchedProgressBar extends StatelessWidget {
         return LinearProgressIndicator(
           value: r,
           backgroundColor: const Color(0xff0a0a0a),
-          valueColor: const AlwaysStoppedAnimation(Color(0xfff6b012)),
+          valueColor: const AlwaysStoppedAnimation(Color(0xffffaf00)),
           minHeight: 3,
         );
       },
