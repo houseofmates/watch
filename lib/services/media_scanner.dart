@@ -86,32 +86,6 @@ class MediaScanner {
     return items;
   }
 
-  Future<List<MediaItem>> _scanImages(String root) async {
-    final List<MediaItem> items = [];
-    await for (final albumDir in _dirs(root)) {
-      String? thumb;
-      if (await File(p.join(albumDir.path, 'thumb.jpg')).exists()) {
-        thumb = p.join(albumDir.path, 'thumb.jpg');
-      }
-      await for (final img in _files(albumDir.path)) {
-        final ext = p.extension(img.path).toLowerCase();
-        if (!supportedImageExts.contains(ext)) continue;
-        final stat = await img.stat();
-        items.add(MediaItem(
-          path: img.path,
-          category: MediaCategory.images,
-          type: MediaType.image,
-          title: p.basenameWithoutExtension(img.path),
-          albumArtPath: thumb ?? img.path,
-          fileSizeBytes: stat.size.toInt(),
-          modified: stat.modified,
-          extension: ext,
-        ));
-      }
-    }
-    return items;
-  }
-
   // ── SHOWS ── Series Name/Season 01/Episode 01.mkv
   Future<List<MediaItem>> _scanShows(String root) async {
     final items = <MediaItem>[];
