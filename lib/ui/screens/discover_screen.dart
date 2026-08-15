@@ -192,8 +192,8 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       ),
     );
   }
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildCard(BuildContext context, JResult item, int cols) {
+    final posterUrl = item.posterUrl(ref.watch(jellyseerrApiUrlProvider));
     final isMovie = item.mediaType == 'movie';
     final subText = '${item.releaseDate ?? '?'} · ${isMovie ? 'movie' : 'tv'} · ${item.rating?.toStringAsFixed(1) ?? '?'}';
     final placeholder = _imagePlaceholder(isMovie);
