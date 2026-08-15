@@ -26,7 +26,9 @@ class PornScreen extends ConsumerWidget {
         data: (all) {
           final porn = all.where((m) => m.category == MediaCategory.porn).toList();
           final Map<String, List<MediaItem>> byStudio = {};
-          for (final m in porn) byStudio.putIfAbsent(m.seriesName ?? 'unknown', () => []).add(m);
+          for (final m in porn) {
+            byStudio.putIfAbsent(m.seriesName ?? 'unknown', () => []).add(m);
+          }
           if (byStudio.isEmpty) return const Center(child: Text('no adult content found.'));
           return ListView.builder(
             padding: const EdgeInsets.all(12),

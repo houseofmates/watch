@@ -18,7 +18,9 @@ class MusicScreen extends ConsumerWidget {
         data: (all) {
           final music = all.where((m) => m.category == MediaCategory.music).toList();
           final Map<String?, List<MediaItem>> albums = {};
-          for (final m in music) albums.putIfAbsent(m.seriesName, () => []).add(m);
+          for (final m in music) {
+            albums.putIfAbsent(m.seriesName, () => []).add(m);
+          }
           if (albums.isEmpty) return const Center(child: Text('no music found.'));
           return ListView.builder(
             padding: const EdgeInsets.all(12),
