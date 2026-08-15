@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:watch/core/constants.dart';
 import 'package:watch/models/media_item.dart';
 import 'package:watch/services/providers.dart';
-import 'package:watch/ui/screens/image_viewer_screen.dart';
 import 'package:watch/ui/screens/porn_screen.dart';
 import 'package:watch/ui/screens/movies_screen.dart';
 import 'package:watch/ui/screens/shows_screen.dart';
@@ -45,7 +44,6 @@ class _CategorySection extends ConsumerWidget {
         );
     final catIcon = {
       'music': Icons.music_note,
-      'images': Icons.photo_library,
       'shows': Icons.tv,
       'movies': Icons.movie,
       'porn': Icons.lock,
@@ -58,7 +56,7 @@ class _CategorySection extends ConsumerWidget {
           child: Row(children: [
             Icon(catIcon[category] ?? Icons.folder, size: 20),
             const SizedBox(width: 8),
-            Text(category.toUpperCase(), style: Theme.of(context).textTheme.titleLarge),
+            Text(category.toLowerCase(), style: Theme.of(context).textTheme.titleLarge),
             const Spacer(),
             Text('${groupsAsync.value?.length ?? 0}'),
           ]),
