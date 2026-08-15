@@ -101,7 +101,7 @@ class _Icon extends StatelessWidget {
     };
     final icon = iconMap[category] ?? Icons.folder;
     return ColoredBox(
-      color: const Color(0xff1a1a3a),
+      color: const Color(0xff0a0a0a),
       child: Center(child: Icon(icon, size: 44, color: Colors.deepPurple.shade300)),
     );
   }

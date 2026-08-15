@@ -433,7 +433,7 @@ class _DetailSheet extends StatelessWidget {
                         style: TextStyle(color: Colors.grey.shade500, fontSize: 13)),
                     if (item.rating != null)
                       Row(children: [
-                        const Icon(Icons.star, size: 16, color: Colors.amber),
+                        const Icon(Icons.star, size: 16, color: Color(0xffffaf00)),
                         const SizedBox(width: 4),
                         Text(item.rating!.toStringAsFixed(1), style: TextStyle(color: Colors.grey.shade400, fontSize: 13)),
                       ]),
