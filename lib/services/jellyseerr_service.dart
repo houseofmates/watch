@@ -25,7 +25,6 @@ class JResult {
   });
 
   factory JResult.fromJson(Map<String, dynamic> m, String mediaTypeOverride) {
-    final isMovie = mediaTypeOverride == 'movie';
     return JResult(
       id: m['id'] as int,
       mediaType: mediaTypeOverride,
