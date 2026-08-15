@@ -15,6 +15,7 @@ final themeModeProvider = FutureProvider<String>((ref) async {
 final pornToggleProvider = StateNotifierProvider<PornToggleNotifier, bool>((ref) {
   return PornToggleNotifier();
 });
+
 class PornToggleNotifier extends StateNotifier<bool> {
   PornToggleNotifier() : super(true);
   Future<void> toggle(bool value) async {
@@ -27,6 +28,7 @@ final mediaRootsProvider = FutureProvider<Map<String, String>>((ref) async {
   return await (await SettingsRepo.getInstance()).getMediaRoots();
 });
 
+/// Tracks the last-modified timestamp of media files so the UI can refresh.
 final mediaMtimeProvider = StateProvider<double>((ref) => 0.0);
 
 final allMediaProvider = FutureProvider<List<MediaItem>>((ref) async {
@@ -36,6 +38,24 @@ final allMediaProvider = FutureProvider<List<MediaItem>>((ref) async {
   if (roots.isEmpty) return [];
   final scanner = MediaScanner(mediaRoots: roots, pornEnabled: pornEnabled);
   return await scanner.scanAll();
+});
+
+final categoryProvider = StateProvider<String>((ref) => MediaCategory.all);
+
+final filteredMediaProvider = Provider<AsyncValue<List<MediaItem>>>((ref) {
+  final cat = ref.watch(categoryProvider);
+  final all = ref.watch(allMediaProvider);
+  return all.whenData((items) {
+    if (cat == MediaCategory.all) return items;
+    return items.where((m) => m.category == cat).toList();
+  });
+});
+
+/// Jellyseerr API base URL — on web we proxy through the local watch server,
+/// on native we connect directly to the configured instance.
+final jellyseerrApiUrlProvider = Provider<String>((ref) {
+  if (kIsWeb) return '/api/jellyseerr';
+  return (ref.state.hasValue ? ref.state.value : null) ?? '';
 });
 
 /// Start polling /api/media-mtime on web (called once at app startup).
@@ -59,17 +79,6 @@ void stopMediaWatcher() {
   _mtimePoller?.cancel();
   _mtimePoller = null;
 }
-
-final categoryProvider = StateProvider<String>((ref) => MediaCategory.all);
-
-final filteredMediaProvider = Provider<AsyncValue<List<MediaItem>>>((ref) {
-  final cat = ref.watch(categoryProvider);
-  final all = ref.watch(allMediaProvider);
-  return all.whenData((items) {
-    if (cat == MediaCategory.all) return items;
-    return items.where((m) => m.category == cat).toList();
-  });
-});
 
 List<MediaGroup> groupMedia(List<MediaItem> items, String category) {
   if (category == MediaCategory.shows) {
