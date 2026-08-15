@@ -148,29 +148,29 @@ class JellyseerrService {
     return Future.value([]);
   }
 
-  /// Convenience: log in to jellyseerr via username/password.
-  /// Tries the common login endpoints.
-  Future<bool> login(String username, String password) async {
-    final candidates = [
-      '/api/v1/auth/login',
-      '/api/v1/auth/local/login',
-      '/api/v1/auth/signin',
-      '/api/v1/login',
-    ];
-    for (final path in candidates) {
-      final url = _url(path);
-      try {
-        final resp = await http.post(
-          Uri.parse(url),
-          headers: {'Content-Type': 'application/json', ..._headers},
-          body: jsonEncode({'username': username, 'password': password}),
-        );
-        _captureCookies(resp);
-        if (resp.statusCode == 200 || resp.statusCode == 201) return true;
-        if (resp.statusCode == 401) return false;
-      } catch (_) {}
+  /// Convenience: log in to jellyseerr via email/password.
+  /// Uses the jellyseerr local auth endpoint.
+  Future<bool> login(String email, String password) async {
+    final url = _url('/api/v1/auth/local');
+    try {
+      final resp = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json', ..._headers},
+        body: jsonEncode({'email': email, 'password': password}),
+      );
+      _captureCookies(resp);
+      // Check for JWT token in response
+      if (resp.statusCode == 200 || resp.statusCode == 201) {
+        final body = jsonDecode(resp.body);
+        if (body is Map<String, dynamic> && body['token'] != null) {
+          apiKey = body['token'] as String;
+        }
+        return true;
+      }
+      return false;
+    } catch (_) {
+      return false;
     }
-    return false;
   }
 
   /// Check if currently authenticated.
