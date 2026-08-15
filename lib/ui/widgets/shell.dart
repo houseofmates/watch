@@ -31,7 +31,6 @@ class _WatchShellState extends ConsumerState<WatchShell> {
       _NavItem(icon: Icons.home, label: 'home', path: '/'),
       _NavItem(icon: Icons.tv, label: 'discover', path: '/discover'),
       _NavItem(icon: Icons.music_note, label: 'music', path: '/music'),
-      _NavItem(icon: Icons.photo_library, label: 'images', path: '/images'),
       _NavItem(icon: Icons.tv, label: 'shows', path: '/shows'),
       _NavItem(icon: Icons.movie, label: 'movies', path: '/movies'),
       if (pornEnabled) _NavItem(icon: Icons.lock, label: 'adult', path: '/porn'),
