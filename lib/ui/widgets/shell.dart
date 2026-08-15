@@ -12,11 +12,24 @@ class WatchShell extends ConsumerStatefulWidget {
 
 class _WatchShellState extends ConsumerState<WatchShell> {
   @override
+  void initState() {
+    super.initState();
+    startMediaWatcher(ref);
+  }
+
+  @override
+  void dispose() {
+    stopMediaWatcher();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
     final pornEnabled = ref.watch(pornToggleProvider);
     final items = [
       _NavItem(icon: Icons.home, label: 'home', path: '/'),
+      _NavItem(icon: Icons.tv, label: 'discover', path: '/discover'),
       _NavItem(icon: Icons.music_note, label: 'music', path: '/music'),
       _NavItem(icon: Icons.photo_library, label: 'images', path: '/images'),
       _NavItem(icon: Icons.tv, label: 'shows', path: '/shows'),
@@ -33,6 +46,7 @@ class _WatchShellState extends ConsumerState<WatchShell> {
         body: widget.child,
         bottomNavigationBar: NavigationBar(
           selectedIndex: sel >= 0 ? sel : 0,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           destinations: items
               .map((n) => NavigationDestination(icon: Icon(n.icon), label: n.label))
               .toList(),
