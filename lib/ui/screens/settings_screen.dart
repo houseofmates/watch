@@ -43,12 +43,6 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const Divider(),
           const Text('media roots', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-<<<<<<< Updated upstream
-=======
-          const SizedBox(height: 4),
-          const Text('set local paths (e.g. /storage/emulated/0/movies) or smb:// / nfs://',
-              style: TextStyle(color: Color(0xff3c9fdd), fontSize: 12)),
->>>>>>> Stashed changes
           const SizedBox(height: 8),
           rootsAsync.when(
             data: (roots) => Column(children: roots.entries.map((e) {

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -26,53 +25,18 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   Future<void> _init() async {
     if (widget.mediaItem.type == MediaType.audio) {
       _audio = AudioPlayer();
-<<<<<<< Updated upstream
       await _audio!.setSourceDeviceFile(widget.mediaItem.path);
       _audio!.onPlayerComplete.listen((_) => setState(() {}));
-=======
-      if (kIsWeb) {
-        await _audio!.setSourceUrl(widget.mediaItem.path);
-      } else {
-        await _audio!.setSourceDeviceFile(widget.mediaItem.path);
-      }
-      _audio!.onPlayerComplete.listen((_) {
-        PlaybackStateRepo.clearPosition(widget.mediaItem.path);
-        setState(() {});
-      });
-      _audio!.onPositionChanged.listen((pos) => _autoSave());
-      if (savedMs != null && savedMs > 5000) {
-        _audio!.seek(Duration(milliseconds: savedMs));
-      }
->>>>>>> Stashed changes
     } else {
-      final c = kIsWeb
-          ? VideoPlayerController.network(widget.mediaItem.path)
-          : VideoPlayerController.file(File(widget.mediaItem.path));
+      final c = VideoPlayerController.file(File(widget.mediaItem.path));
       await c.initialize();
       _chewie = ChewieController(videoPlayerController: c, autoPlay: true, looping: false);
     }
     if (mounted) setState(() => _ready = true);
   }
 
-<<<<<<< Updated upstream
   @override
   void dispose() { _audio?.dispose(); _chewie?.dispose(); super.dispose(); }
-=======
-  Future<void> _autoSave() async {
-    final now = DateTime.now();
-    if (now.difference(_lastSave).inSeconds < 5) return;
-    _lastSave = now;
-    int? pos;
-    if (_audio != null) return; // handled by stream listener
-    if (_chewie != null) {
-      pos = _chewie!.videoPlayerController.value.position.inMilliseconds;
-    }
-    if (pos != null && pos > 0) {
-      final dur = _chewie!.videoPlayerController.value.duration.inMilliseconds;
-      await PlaybackStateRepo.savePosition(widget.mediaItem.path, pos, durationMs: dur);
-    }
-  }
->>>>>>> Stashed changes
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -98,7 +62,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                     );
                   },
                 ),
-<<<<<<< Updated upstream
                 StreamBuilder<Duration?>(
                   stream: _audio!.onDurationChanged,
                   builder: (_, d) {
@@ -122,60 +85,3 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
             : Chewie(controller: _chewie!),
       );
 }
-=======
-              ),
-            );
-          },
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('cancel')),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _castTo(CastDevice device) async {
-    try {
-      await CastService.startFileServer(widget.mediaItem.path);
-      final url = await CastService.fileUrl;
-      final ok = await CastService.cast(device.location, url);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(ok ? 'casting to ${device.name}' : 'cast failed'),
-        ));
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('cast error: $e')));
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _saveFinalPosition();
-    CastService.stopFileServer();
-    _focusNode.dispose();
-    _audio?.dispose();
-    _chewie?.dispose();
-    super.dispose();
-  }
-
-  void _saveFinalPosition() {
-    if (_chewie != null) {
-      final c = _chewie!.videoPlayerController.value;
-      final pos = c.position.inMilliseconds;
-      if (pos > 0) PlaybackStateRepo.savePosition(widget.mediaItem.path, pos, durationMs: c.duration.inMilliseconds);
-    }
-  }
-
-  static String _fmtMs(int ms) {
-    final s = ms ~/ 1000;
-    final m = s ~/ 60;
-    final h = m ~/ 60;
-    final secs = (s % 60).toString().padLeft(2, '0');
-    if (h > 0) return '$h:${(m % 60).toString().padLeft(2, '0')}:$secs';
-    return '${m % 60}:$secs';
-  }
-}
->>>>>>> Stashed changes

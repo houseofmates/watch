@@ -1,7 +1,4 @@
-import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 import 'package:watch/core/constants.dart';
 import 'package:watch/models/media_item.dart';
@@ -13,8 +10,6 @@ class MediaScanner {
   MediaScanner({required this.mediaRoots, this.pornEnabled = true});
 
   Future<List<MediaItem>> scanAll() async {
-    if (kIsWeb) return _scanWeb();
-
     final List<MediaItem> all = [];
     for (final entry in mediaRoots.entries) {
       final category = entry.key;
@@ -28,55 +23,6 @@ class MediaScanner {
     return all;
   }
 
-<<<<<<< Updated upstream
-=======
-  Future<List<MediaItem>> _scanWeb() async {
-    try {
-      final res = await http.get(Uri.parse('/api/media-list'));
-      if (res.statusCode != 200) return [];
-      final List<dynamic> raw = jsonDecode(res.body);
-      return raw.where((m) {
-        final cat = m['category'] as String;
-        return cat != MediaCategory.music && !(cat == MediaCategory.porn && !pornEnabled);
-      }).map<MediaItem>((m) => MediaItem(
-        path: m['path'] as String,
-        category: m['category'] as String,
-        type: m['type'] as String,
-        title: m['title'] as String,
-        seriesName: m['seriesName'] as String?,
-        season: m['season'] as String?,
-        fileSizeBytes: m['fileSizeBytes'] as int,
-        modified: DateTime.fromMillisecondsSinceEpoch(((m['modified'] as num) * 1000).round()),
-        extension: m['extension'] as String,
-        durationSeconds: m['durationSeconds'] as int?,
-      )).toList()
-        ..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
-    } catch (e) {
-      print('watch: web scan error: $e');
-      return [];
-    }
-  }
-
-  Future<void> _enrichMetadata(MediaItem item) async {
-    if (!MetadataService.isAvailable) return;
-    final data = await MetadataService.probe(item.path);
-    if (data != null) {
-      final meta = MetadataService.extract(data);
-      item.artist = meta['artist'] as String?;
-      item.album = meta['album'] as String?;
-      item.trackNumber = meta['trackNumber'] as int?;
-      item.durationSeconds = meta['durationSeconds'] as int?;
-      item.codec = meta['codec'] as String?;
-      item.resolution = meta['resolution'] as String?;
-    }
-    // generate thumbnail for porn videos
-    if (item.category == MediaCategory.porn && item.type == MediaType.video) {
-      final thumb = await ThumbnailService.generate(item.path);
-      if (thumb != null) item.thumbnailPath = thumb;
-    }
-  }
-
->>>>>>> Stashed changes
   Future<List<MediaItem>> _scanCategory(String category, String root) async {
     switch (category) {
       case MediaCategory.music: return _scanMusic(root);
@@ -256,14 +202,14 @@ class MediaScanner {
 
   // ── helpers ────────────────────────────────────────────────────────────
   Stream<Directory> _dirs(String path) async* {
-    await for (final e in Directory(path).list(followLinks: false)) {
-      if (e is Directory) yield e;
+    await for (final e in Directory(path).list(followLinks: false).cast<Directory>()) {
+      yield e;
     }
   }
 
   Stream<File> _files(String path) async* {
-    await for (final e in Directory(path).list(followLinks: false)) {
-      if (e is File) yield e;
+    await for (final e in Directory(path).list(followLinks: false).cast<File>()) {
+      yield e;
     }
   }
 
