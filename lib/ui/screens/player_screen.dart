@@ -33,7 +33,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     if (widget.mediaItem.type == MediaType.audio) {
       _audio = AudioPlayer();
       if (kIsWeb) {
-        await _audio!.setUrl(widget.mediaItem.path);
+        await _audio!.setSourceUrl(widget.mediaItem.path);
       } else {
         await _audio!.setSourceDeviceFile(widget.mediaItem.path);
       }
@@ -42,7 +42,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
         setState(() {});
       });
       _audio!.onPositionChanged.listen((_) => _autoSave());
-      _savedMs = await PlaybackStateRepo.getPosition(widget.mediaItem.path);
+      _savedMs = await _audio!.getCurrentPosition();
+      if (_savedMs == null || _savedMs! < 1000) {
+        _savedMs = await PlaybackStateRepo.getPosition(widget.mediaItem.path);
+      }
       if (_savedMs != null && _savedMs! > 5000) {
         await _audio!.seek(Duration(milliseconds: _savedMs!));
       }
@@ -71,10 +74,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     int? pos;
     int? dur;
     if (_audio != null) {
-      pos = (_audio!.currentState == PlayerState.playing
-          ? await _audio!.getCurrentPosition()
-          : null);
-      dur = await _audio!.getDuration();
+      pos = await _audio!.getCurrentPosition();
+      final d = _audio!.duration;
+      dur = d?.inMilliseconds;
       if (pos != null && pos > 0) {
         await PlaybackStateRepo.savePosition(
           widget.mediaItem.path, pos, durationMs: dur,
@@ -141,7 +143,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                           );
                         },
                       ),
-                      StreamBuilder<Duration?(
+                      StreamBuilder<Duration?>(
                         stream: _audio!.onDurationChanged,
                         builder: (_, d) {
                           final dur = d.data;
