@@ -18,7 +18,9 @@ class MoviesScreen extends ConsumerWidget {
         data: (all) {
           final movies = all.where((m) => m.category == MediaCategory.movies).toList();
           final Map<String?, List<MediaItem>> groups = {};
-          for (final m in movies) groups.putIfAbsent(m.seriesName ?? 'Standalone', () => []).add(m);
+          for (final m in movies) {
+            groups.putIfAbsent(m.seriesName ?? 'Standalone', () => []).add(m);
+          }
           if (groups.isEmpty) return const Center(child: Text('no movies found.'));
           final w = MediaQuery.of(context).size.width;
           final cols = w < 600 ? 2 : w < 1024 ? 3 : 4;
@@ -42,7 +44,7 @@ class MoviesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _MovieCard(BuildContext context, MediaGroup group, int cols) => GestureDetector(
+  Widget _buildMovieCard(BuildContext context, MediaGroup group, int cols) => GestureDetector(
     onTap: () => Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => MovieListScreen(groupName: group.name, movies: group.items)),
     ),

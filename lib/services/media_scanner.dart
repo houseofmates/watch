@@ -42,7 +42,7 @@ class MediaScanner {
           .toList()
         ..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     } catch (e) {
-      print('watch: web scan error: $e');
+      debugPrint('watch: web scan error: $e');
       return [];
     }
   }

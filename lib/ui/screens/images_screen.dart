@@ -18,7 +18,9 @@ class ImagesScreen extends ConsumerWidget {
         data: (all) {
           final imgs = all.where((m) => m.category == MediaCategory.images).toList();
           final Map<String, List<MediaItem>> albums = {};
-          for (final m in imgs) albums.putIfAbsent(m.seriesName ?? 'unknown', () => []).add(m);
+          for (final m in imgs) {
+            albums.putIfAbsent(m.seriesName ?? 'unknown', () => []).add(m);
+          }
           if (albums.isEmpty) return const Center(child: Text('no images found.'));
           return GridView.builder(
             padding: const EdgeInsets.all(8),
