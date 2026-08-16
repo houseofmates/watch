@@ -280,6 +280,8 @@ class _ThumbnailImageState extends State<ThumbnailImage> {
           body: jsonEncode(body),
         );
         if (resp.statusCode != 200) return false;
+        // Force Image.network to re-fetch — server now serves the custom thumbnail
+        if (mounted) setState(() => _refreshCounter++);
       } else {
         // Native: save locally
         if (imageUrl != null) {
