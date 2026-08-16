@@ -8,7 +8,7 @@ import 'package:watch/ui/widgets/thumbnail_image.dart';
 import 'package:watch/ui/widgets/watched_progress_bar.dart';
 
 /// Category detail page reached via URL slug:
-///   /shows/<show-slug>      → seasons as horizontal rows, each with episode thumbnails
+///   /shows/<show-slug>      → seasons as horizontal rows of episodes
 ///   /movies/<group-slug>    → individual movies grid
 ///   /porn/<studio-slug>     → individual videos grid
 ///
@@ -48,44 +48,37 @@ class _CategoryDetailScreenState extends ConsumerState<CategoryDetailScreen> {
             return const Center(child: Text('nothing here yet.'));
           }
 
-          // Filter items matching the slug.
-          // Shows match by seriesName (show folder); movies/porn match by
-          // seriesName (group dir/studio) or individual title (standalone).
-          late final List<MediaItem> groupItems;
-          if (widget.category == MediaCategory.shows) {
-            groupItems = catItems.where(
-              (m) => m.seriesName != null && slugify(m.seriesName!) == widget.slug,
-            ).toList();
-          } else {
-            groupItems = catItems.where((m) {
-              if (m.seriesName != null) return slugify(m.seriesName!) == widget.slug;
-              return slugify(m.title) == widget.slug;
-            }).toList();
-          }
+          // Reconstruct groups and find the one matching our slug
+          final groups = groupMedia(catItems, widget.category);
+          final matchingGroup = groups.firstWhere(
+            (g) => slugify(g.name) == widget.slug,
+            orElse: () => null,
+          );
 
-          if (groupItems.isEmpty) {
+          if (matchingGroup == null || matchingGroup.items.isEmpty) {
             return const Center(child: Text('no items found for this slug.'));
           }
 
           if (widget.category == MediaCategory.shows) {
             // Group episodes by season
             final seasons = <String, List<MediaItem>>{};
-            for (final item in groupItems) {
+            for (final item in matchingGroup.items) {
               final ssn = item.season ?? 'Unknown';
               seasons.putIfAbsent(ssn, () => []).add(item);
             }
             if (seasons.length == 1) {
-              // Single season — show episodes directly in a grid
-              final episodes = seasons.values.first;
-              return _EpisodeGrid(seasonName: seasons.keys.first, episodes: episodes);
+              return _EpisodeGrid(
+                seasonName: seasons.keys.first,
+                episodes: seasons.values.first,
+              );
             }
-            return _SeasonList(seasons: seasons, category: widget.category);
+            return _SeasonList(seasons: seasons);
           }
 
           // Movies and porn: show individual items in a grid
           return _ItemGrid(
             category: widget.category,
-            items: groupItems,
+            items: matchingGroup.items,
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -98,9 +91,8 @@ class _CategoryDetailScreenState extends ConsumerState<CategoryDetailScreen> {
 /// List of seasons, each with a horizontal scrollable row of episode thumbnails.
 class _SeasonList extends StatelessWidget {
   final Map<String, List<MediaItem>> seasons;
-  final String category;
 
-  const _SeasonList({required this.seasons, required this.category});
+  const _SeasonList({required this.seasons});
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +105,6 @@ class _SeasonList extends StatelessWidget {
       itemBuilder: (_, i) {
         final entry = seasons.entries.elementAt(i);
         final episodes = entry.value;
-        final allEps = episodes;
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
           child: Column(
@@ -125,7 +116,7 @@ class _SeasonList extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              Text('${allEps.length} episodes',
+              Text('${episodes.length} episodes',
                   style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
               const SizedBox(height: 8),
               SizedBox(
@@ -266,45 +257,48 @@ class _EpisodeGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final w = MediaQuery.of(context).size.width;
     final cols = w < 600 ? 2 : w < 1024 ? 3 : 4;
-    return GridView.builder(
-      padding: const EdgeInsets.all(12),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: cols, crossAxisSpacing: 8, mainAxisSpacing: 8, childAspectRatio: 0.75,
-      ),
-      itemCount: episodes.length,
-      itemBuilder: (_, i) {
-        final ep = episodes[i];
-        return GestureDetector(
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => PlayerScreen(mediaItem: ep)),
-          ),
-          child: Card(
-            clipBehavior: Clip.hardEdge,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(child: Stack(
-                  children: [
-                    ThumbnailImage(
-                      thumbnailUrl: ep.thumbnailPath,
-                      videoPath: ep.path,
-                      category: ep.category,
-                      fit: BoxFit.cover,
-                    ),
-                    Positioned(left: 0, right: 0, bottom: 0, child: WatchedProgressBar(filePath: ep.path)),
-                  ],
-                )),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                  color: Theme.of(context).cardColor,
-                  child: Text(ep.title, maxLines: 2, overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontWeight: FontWeight.w600)),
-                ),
-              ],
+    return Scaffold(
+      appBar: AppBar(title: Text(seasonName)),
+      body: GridView.builder(
+        padding: const EdgeInsets.all(12),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: cols, crossAxisSpacing: 8, mainAxisSpacing: 8, childAspectRatio: 0.75,
+        ),
+        itemCount: episodes.length,
+        itemBuilder: (_, i) {
+          final ep = episodes[i];
+          return GestureDetector(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => PlayerScreen(mediaItem: ep)),
             ),
-          ),
-        );
-      },
+            child: Card(
+              clipBehavior: Clip.hardEdge,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(child: Stack(
+                    children: [
+                      ThumbnailImage(
+                        thumbnailUrl: ep.thumbnailPath,
+                        videoPath: ep.path,
+                        category: ep.category,
+                        fit: BoxFit.cover,
+                      ),
+                      Positioned(left: 0, right: 0, bottom: 0, child: WatchedProgressBar(filePath: ep.path)),
+                    ],
+                  ))),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                    color: Theme.of(context).cardColor,
+                    child: Text(ep.title, maxLines: 2, overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
