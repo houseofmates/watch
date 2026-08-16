@@ -50,10 +50,13 @@ class _CategoryDetailScreenState extends ConsumerState<CategoryDetailScreen> {
 
           // Reconstruct groups and find the one matching our slug
           final groups = groupMedia(catItems, widget.category);
-          final matchingGroup = groups.firstWhere(
-            (g) => slugify(g.name) == widget.slug,
-            orElse: () => null,
-          );
+          MediaGroup? matchingGroup;
+          for (final g in groups) {
+            if (slugify(g.name) == widget.slug) {
+              matchingGroup = g;
+              break;
+            }
+          }
 
           if (matchingGroup == null || matchingGroup.items.isEmpty) {
             return const Center(child: Text('no items found for this slug.'));
@@ -286,7 +289,7 @@ class _EpisodeGrid extends StatelessWidget {
                       ),
                       Positioned(left: 0, right: 0, bottom: 0, child: WatchedProgressBar(filePath: ep.path)),
                     ],
-                  ))),
+                  )),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                     color: Theme.of(context).cardColor,
