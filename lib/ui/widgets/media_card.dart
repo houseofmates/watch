@@ -5,6 +5,21 @@ import 'package:watch/models/media_item.dart';
 import 'package:watch/ui/widgets/thumbnail_image.dart';
 import 'package:watch/ui/widgets/watched_progress_bar.dart';
 
+String _formatSubtitle(MediaGroup group) {
+  final durations = group.items
+      .where((item) => item.durationSeconds != null)
+      .map((item) => item.durationSeconds!.toDouble())
+      .toList();
+  if (durations.isEmpty) {
+    return '${group.itemCount} item${group.itemCount != 1 ? 's'}';
+  }
+  final total = durations.fold(0.0, (a, b) => a + b);
+  final h = (total / 3600).floor();
+  final m = ((total % 3600) / 60).floor();
+  if (h > 0) return '${h}h ${m}m';
+  return '${m}m';
+}
+
 class MediaCard extends StatelessWidget {
   final MediaGroup group;
   final VoidCallback? onTap;
