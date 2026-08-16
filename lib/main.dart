@@ -10,7 +10,6 @@ import 'package:watch/ui/screens/movies_screen.dart';
 import 'package:watch/ui/screens/porn_screen.dart';
 import 'package:watch/ui/screens/search_screen.dart';
 import 'package:watch/ui/screens/settings_screen.dart';
-import 'package:watch/ui/screens/image_viewer_screen.dart';
 import 'package:watch/ui/widgets/shell.dart';
 
 final _router = GoRouter(
@@ -23,10 +22,7 @@ final _router = GoRouter(
     GoRoute(path: '/movies', builder: (_, __) => _Root(child: MoviesScreen())),
     GoRoute(path: '/search', builder: (_, __) => _Root(child: SearchScreen())),
     GoRoute(path: '/settings', builder: (_, __) => _Root(child: SettingsScreen())),
-    GoRoute(path: '/porn', builder: (_, __) => _Root(child: PornScreen())),
-    GoRoute(path: '/image-viewer', builder: (_, GoRouterState st) => ImageViewerScreen(
-      path: st.uri.queryParameters['path'] ?? '', title: st.uri.queryParameters['title'] ?? '',
-    )),
+    GoRoute(path: '/search', builder: (_, __) => _Root(child: SearchScreen())),
   ],
 );
 
