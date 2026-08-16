@@ -1,10 +1,9 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:watch/core/constants.dart';
 import 'package:watch/models/media_item.dart';
 import 'package:watch/ui/screens/player_screen.dart';
+import 'package:watch/ui/widgets/thumbnail_image.dart';
 import 'package:watch/ui/widgets/watched_progress_bar.dart';
 import 'package:watch/services/providers.dart';
 
@@ -54,15 +53,6 @@ class PornScreen extends ConsumerWidget {
   }
 }
 
-class _PornPlaceholder extends StatelessWidget {
-  const _PornPlaceholder();
-  @override
-  Widget build(BuildContext context) => ColoredBox(
-    color: Theme.of(context).cardColor,
-    child: Center(child: Icon(Icons.lock, size: 44, color: Color(0xff3c9fdd))),
-  );
-}
-
 class StudioVideoGrid extends StatelessWidget {
   final String studioName;
   final List<MediaItem> videos;
@@ -82,8 +72,6 @@ class StudioVideoGrid extends StatelessWidget {
         itemCount: videos.length,
         itemBuilder: (_, i) {
           final m = videos[i];
-          final placeholder = const _PornPlaceholder();
-          final thumb = m.thumbnailPath;
           return GestureDetector(
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => PlayerScreen(mediaItem: m))),
             child: Card(
@@ -93,11 +81,12 @@ class StudioVideoGrid extends StatelessWidget {
                 children: [
                   Expanded(child: Stack(
                     children: [
-                      thumb != null
-                          ? (kIsWeb
-                              ? Image.network(thumb, fit: BoxFit.cover, errorBuilder: (_, __, ___) => placeholder)
-                              : Image.file(File(thumb), fit: BoxFit.cover, errorBuilder: (_, __, ___) => placeholder))
-                          : placeholder,
+                      ThumbnailImage(
+                        thumbnailUrl: m.thumbnailPath,
+                        videoPath: m.path,
+                        category: MediaCategory.porn,
+                        fit: BoxFit.cover,
+                      ),
                       Positioned(left: 0, right: 0, bottom: 0, child: WatchedProgressBar(filePath: m.path)),
                     ],
                   )),
