@@ -7,7 +7,6 @@ import 'package:path/path.dart' as p;
 import '../core/constants.dart';
 
 // Dart-define overrides (compiled into APK / web via --dart-define or --dart-define-from-file)
-const _dartMusicRoot  = String.fromEnvironment('WATCH_MUSIC_ROOT');
 const _dartShowsRoot  = String.fromEnvironment('WATCH_SHOWS_ROOT');
 const _dartMoviesRoot = String.fromEnvironment('WATCH_MOVIES_ROOT');
 const _dartPornRoot   = String.fromEnvironment('WATCH_PORN_ROOT');
@@ -32,7 +31,6 @@ class SettingsRepo {
   static Future<SettingsRepo> _load() async {
     final env = <String, String>{};
     // 1. Try dart-defines (compiled into APK via --dart-define)
-    if (_dartMusicRoot.isNotEmpty)  env['WATCH_MUSIC_ROOT']  = _dartMusicRoot;
     if (_dartShowsRoot.isNotEmpty)  env['WATCH_SHOWS_ROOT']  = _dartShowsRoot;
     if (_dartMoviesRoot.isNotEmpty) env['WATCH_MOVIES_ROOT'] = _dartMoviesRoot;
     if (_dartPornRoot.isNotEmpty)   env['WATCH_PORN_ROOT']   = _dartPornRoot;
@@ -62,7 +60,6 @@ class SettingsRepo {
 
   /// Hardcoded personal defaults. Consumers should use .env or .dart-define instead.
   static Map<String, String> get _homeDefaults => {
-        MediaCategory.music:  '/mnt/nextcloud/house/files/media/music',
         MediaCategory.shows:  '/mnt/nextcloud/house/files/media/shows',
         MediaCategory.movies:  '/mnt/nextcloud/house/files/media/movies',
         MediaCategory.porn:   '/mnt/nextcloud/house/files/media/porn',
@@ -70,7 +67,6 @@ class SettingsRepo {
 
   Map<String, String> get _defaultRoots {
     return {
-      MediaCategory.music:  _envMap['WATCH_MUSIC_ROOT']  ?? _homeDefaults[MediaCategory.music]!,
       MediaCategory.shows:  _envMap['WATCH_SHOWS_ROOT']  ?? _homeDefaults[MediaCategory.shows]!,
       MediaCategory.movies: _envMap['WATCH_MOVIES_ROOT'] ?? _homeDefaults[MediaCategory.movies]!,
       MediaCategory.porn:   _envMap['WATCH_PORN_ROOT']   ?? _homeDefaults[MediaCategory.porn]!,
