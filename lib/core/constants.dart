@@ -27,6 +27,24 @@ class MediaType {
   static const String video = 'video';
 }
 
+/// Convert a string like "My Gym Partner's a Monkey" → "my-gym-partners-a-monkey"
+String slugify(String input) {
+  return input
+      .toLowerCase()
+      .replaceAll(RegExp(r'[^\w\s-]'), '')
+      .replaceAll(RegExp(r'\s+'), '-')
+      .replaceAll(RegExp(r'-+'), '-')
+      .replaceAll(RegExp(r'^-|-$'), '');
+}
+
+/// Reverse-lookup: find the original name from a slug by matching against known values.
+String? resolveSlug(String slug, Iterable<String?> candidates) {
+  for (final c in candidates) {
+    if (c != null && slugify(c) == slug) return c;
+  }
+  return null;
+}
+
 const List<String> supportedAudioExts = ['.mp3', '.flac', '.wav', '.aac', '.ogg', '.m4a', '.wma', '.alac'];
 const List<String> supportedVideoExts = ['.mp4', '.mkv', '.avi', '.mov', '.webm', '.flv', '.wmv', '.m4v', '.ts'];
 const List<String> supportedImageExts = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.tiff', '.heic'];
