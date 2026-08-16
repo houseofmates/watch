@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:watch/services/providers.dart';
-import 'package:watch/ui/screens/home_screen.dart';
+import 'package:watch/ui/screens/category_detail_screen.dart';
 import 'package:watch/ui/screens/discover_screen.dart';
-import 'package:watch/ui/screens/shows_screen.dart';
 import 'package:watch/ui/screens/movies_screen.dart';
 import 'package:watch/ui/screens/porn_screen.dart';
 import 'package:watch/ui/screens/search_screen.dart';
@@ -17,10 +16,17 @@ final _router = GoRouter(
     GoRoute(path: '/', builder: (_, __) => _Root(child: HomeScreen())),
     GoRoute(path: '/discover', builder: (_, __) => _Root(child: DiscoverScreen())),
     GoRoute(path: '/shows', builder: (_, __) => _Root(child: ShowsScreen())),
+    GoRoute(path: '/shows/:slug', builder: (_, state) => _Root(child: CategoryDetailScreen(category: 'shows', slug: state.pathParameters['slug']!))),
     GoRoute(path: '/movies', builder: (_, __) => _Root(child: MoviesScreen())),
+    GoRoute(path: '/movies/:slug', builder: (_, state) => _Root(child: CategoryDetailScreen(category: 'movies', slug: state.pathParameters['slug']!))),
+    GoRoute(path: '/porn', builder: (_, __) => _Root(child: PornScreen())),
+    GoRoute(path: '/porn/:slug', builder: (_, state) => _Root(child: CategoryDetailScreen(category: 'porn', slug: state.pathParameters['slug']!))),
     GoRoute(path: '/search', builder: (_, __) => _Root(child: SearchScreen())),
     GoRoute(path: '/settings', builder: (_, __) => _Root(child: SettingsScreen())),
-    GoRoute(path: '/porn', builder: (_, __) => _Root(child: PornScreen())),
+    GoRoute(path: '/player/:path', builder: (_, state) {
+      final path = state.pathParameters['path']!;
+      return _Root(child: PlayerScreen.fromPath(path));
+    }),
   ],
 );
 
