@@ -351,6 +351,7 @@ class _ThumbnailImageState extends State<ThumbnailImage> {
       if (widget.thumbnailUrl!.startsWith('http://') || widget.thumbnailUrl!.startsWith('https://')) {
         image = Image.network(
           widget.thumbnailUrl!,
+          key: ValueKey('network_thumb_${_refreshCounter}'),
           width: widget.width,
           height: widget.height,
           fit: widget.fit,
@@ -359,6 +360,7 @@ class _ThumbnailImageState extends State<ThumbnailImage> {
       } else {
         image = Image.file(
           File(widget.thumbnailUrl!),
+          key: ValueKey('file_thumb_${_refreshCounter}'),
           width: widget.width,
           height: widget.height,
           fit: widget.fit,
@@ -370,6 +372,7 @@ class _ThumbnailImageState extends State<ThumbnailImage> {
     else if (_localThumbPath != null) {
       image = Image.file(
         File(_localThumbPath!),
+        key: ValueKey('local_thumb_${_refreshCounter}'),
         width: widget.width,
         height: widget.height,
         fit: widget.fit,
