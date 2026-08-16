@@ -16,6 +16,7 @@ class MediaCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap ?? () {
         final route = {
+          MediaCategory.shows: '/shows',
           MediaCategory.movies: '/movies',
           MediaCategory.porn: '/porn',
         }[group.category];
