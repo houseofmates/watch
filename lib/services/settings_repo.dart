@@ -63,7 +63,6 @@ class SettingsRepo {
   /// Hardcoded personal defaults. Consumers should use .env or .dart-define instead.
   static Map<String, String> get _homeDefaults => {
         MediaCategory.music:  '/mnt/nextcloud/house/files/media/music',
-        MediaCategory.images: '/mnt/nextcloud/house/files/media/images',
         MediaCategory.shows:  '/mnt/nextcloud/house/files/media/shows',
         MediaCategory.movies:  '/mnt/nextcloud/house/files/media/movies',
         MediaCategory.porn:   '/mnt/nextcloud/house/files/media/porn',
@@ -72,7 +71,6 @@ class SettingsRepo {
   Map<String, String> get _defaultRoots {
     return {
       MediaCategory.music:  _envMap['WATCH_MUSIC_ROOT']  ?? _homeDefaults[MediaCategory.music]!,
-      MediaCategory.images: _envMap['WATCH_IMAGES_ROOT'] ?? _homeDefaults[MediaCategory.images]!,
       MediaCategory.shows:  _envMap['WATCH_SHOWS_ROOT']  ?? _homeDefaults[MediaCategory.shows]!,
       MediaCategory.movies: _envMap['WATCH_MOVIES_ROOT'] ?? _homeDefaults[MediaCategory.movies]!,
       MediaCategory.porn:   _envMap['WATCH_PORN_ROOT']   ?? _homeDefaults[MediaCategory.porn]!,
