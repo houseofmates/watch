@@ -353,7 +353,7 @@ class _ThumbnailImageState extends State<ThumbnailImage> {
       if (widget.thumbnailUrl!.startsWith('http://') || widget.thumbnailUrl!.startsWith('https://')) {
         image = Image.network(
           widget.thumbnailUrl!,
-          key: ValueKey('network_thumb_${_refreshCounter}'),
+          key: ValueKey('network_thumb_$_refreshCounter'),
           width: widget.width,
           height: widget.height,
           fit: widget.fit,
