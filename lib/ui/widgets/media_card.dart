@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:watch/core/constants.dart';
 import 'package:watch/models/media_item.dart';
+import 'package:watch/services/providers.dart';
 import 'package:watch/ui/widgets/thumbnail_image.dart';
 import 'package:watch/ui/widgets/watched_progress_bar.dart';
+
+/// Build a slug-based route path for a group within a category.
+/// Returns e.g. "/shows/my-gym-partners-a-monkey" or "/movies/standalone".
+String _routeForGroup(String category, String groupName) {
+  final slug = groupName == 'Standalone' ? 'standalone' : slugify(groupName);
+  return '/$category/$slug';
+}
 
 String _formatSubtitle(MediaGroup group) {
   final durations = group.items
@@ -33,12 +42,8 @@ class MediaCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap ?? () {
-        final route = {
-          MediaCategory.shows: '/shows',
-          MediaCategory.movies: '/movies',
-          MediaCategory.porn: '/porn',
-        }[group.category];
-        if (route != null) context.go(route);
+        final route = _routeForGroup(group.category, group.name);
+        context.go(route);
       },
       child: SizedBox(
         width: 160,
@@ -56,7 +61,12 @@ class MediaCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(group.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    Text(
+                      group.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
                     Text(_formatSubtitle(group), style: const TextStyle(color: Colors.grey, fontSize: 11)),
                   ],
                 ),
