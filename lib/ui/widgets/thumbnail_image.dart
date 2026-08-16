@@ -83,12 +83,12 @@ class _ThumbnailImageState extends State<ThumbnailImage> {
         '-y', '-ss', '10', '-i', videoPath,
         '-frames:v', '1', '-q:v', '2', '-vf', 'scale=300:-1',
         cachePath,
-      ], timeout: 60);
+      ]).timeout(const Duration(seconds: 60));
       if (File(cachePath).existsSync() && File(cachePath).lengthSync() > 0 && mounted) {
         setState(() => _localThumbPath = cachePath);
       }
     } catch (_) {
-      // ffmpeg not available — leave thumbnail as null
+      // ffmpeg not available or timed out — leave thumbnail as null
     }
   }
 
@@ -103,10 +103,10 @@ class _ThumbnailImageState extends State<ThumbnailImage> {
   @override
   Widget build(BuildContext context) {
     // 1. Server-provided thumbnail URL or local file path
-    if (thumbnailUrl != null && thumbnailUrl!.isNotEmpty) {
-      if (kIsWeb || thumbnailUrl!.startsWith('http://') || thumbnailUrl!.startsWith('https://')) {
+    if (widget.thumbnailUrl != null && widget.thumbnailUrl!.isNotEmpty) {
+      if (kIsWeb || widget.thumbnailUrl!.startsWith('http://') || widget.thumbnailUrl!.startsWith('https://')) {
         return Image.network(
-          thumbnailUrl!,
+          widget.thumbnailUrl!,
           width: widget.width,
           height: widget.height,
           fit: widget.fit,
@@ -114,7 +114,7 @@ class _ThumbnailImageState extends State<ThumbnailImage> {
         );
       }
       return Image.file(
-        File(thumbnailUrl!),
+        File(widget.thumbnailUrl!),
         width: widget.width,
         height: widget.height,
         fit: widget.fit,
