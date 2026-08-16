@@ -8,9 +8,9 @@ import 'package:watch/ui/widgets/thumbnail_image.dart';
 import 'package:watch/ui/widgets/watched_progress_bar.dart';
 
 /// Category detail page reached via URL slug:
-///   /shows/<show-slug>      → seasons as horizontal rows of episodes
-///   /movies/<group-slug>    → individual movies grid
-///   /porn/<studio-slug>     → individual videos grid
+///   `/shows/:slug`         — seasons as horizontal rows of episodes
+///   `/movies/:slug`        — individual movies grid
+///   `/porn/:slug`          — individual videos grid
 ///
 /// Each thumbnail is right-clickable (web) / long-pressable (mobile)
 /// to swap the image via the ThumbnailImage context menu.
