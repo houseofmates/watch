@@ -83,7 +83,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   List<MediaItem> _filter(List<MediaItem> items, String q) {
-    return items.where((m) => m.title.toLowerCase().contains(q))
-      ..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+    return (items.where((m) => m.title.toLowerCase().contains(q)).toList()
+      ..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase())));
   }
 }
