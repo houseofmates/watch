@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -65,6 +66,7 @@ class ThumbnailImage extends StatefulWidget {
 class _ThumbnailImageState extends State<ThumbnailImage> {
   String? _localThumbPath;
   String? _overridePath; // custom override path (native)
+  int _refreshCounter = 0; // forces Image.network to re-fetch after override
 
   @override
   void initState() {
