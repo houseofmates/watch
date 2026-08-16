@@ -109,7 +109,7 @@ List<MediaGroup> groupMedia(List<MediaItem> items, String category) {
       return MediaGroup(
         name: e.key,
         category: category,
-        coverArtPath: firstSeason.isNotEmpty ? firstSeason.first.path : null,
+        coverArtPath: firstSeason.isNotEmpty ? firstSeason.first.thumbnailPath : null,
         items: firstSeason,
       );
     }).toList();
@@ -119,21 +119,56 @@ List<MediaGroup> groupMedia(List<MediaItem> items, String category) {
     for (final item in items.where((i) => i.category == category)) {
       m.putIfAbsent(item.seriesName, () => []).add(item);
     }
-    return m.entries.map((e) => MediaGroup(
-          name: e.key ?? 'Standalone',
+    final groups = <MediaGroup>[];
+    for (final e in m.entries) {
+      if (e.key == null) {
+        // Standalone movies — each file is its own card on the home screen
+        for (final item in e.value) {
+          groups.add(MediaGroup(
+            name: item.title,
+            category: category,
+            coverArtPath: item.thumbnailPath,
+            items: [item],
+          ));
+        }
+      } else {
+        // Movies in subdirectories — group by dir name
+        groups.add(MediaGroup(
+          name: e.key!,
           category: category,
-          coverArtPath: e.value.isNotEmpty ? e.value.first.path : null,
+          coverArtPath: e.value.first.thumbnailPath,
           items: e.value,
-        )).toList();
+        ));
+      }
+    }
+    return groups;
   }
+  // Default: porn (and any other flat category)
   final m = <String?, List<MediaItem>>{};
   for (final item in items.where((i) => i.category == category)) {
     m.putIfAbsent(item.seriesName, () => []).add(item);
   }
-  return m.entries.map((e) => MediaGroup(
-        name: e.key ?? 'Unknown',
+  final groups = <MediaGroup>[];
+  for (final e in m.entries) {
+    if (e.key == null) {
+      // Standalone files — each file is its own card
+      for (final item in e.value) {
+        groups.add(MediaGroup(
+          name: item.title,
+          category: category,
+          coverArtPath: item.thumbnailPath,
+          items: [item],
+        ));
+      }
+    } else {
+      // Files in subdirectories — group by dir name (studio, etc.)
+      groups.add(MediaGroup(
+        name: e.key!,
         category: category,
-        coverArtPath: null,
+        coverArtPath: e.value.first.thumbnailPath,
         items: e.value,
-      )).toList();
+      ));
+    }
+  }
+  return groups;
 }
