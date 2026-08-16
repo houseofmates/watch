@@ -11,12 +11,16 @@ String _formatSubtitle(MediaGroup group) {
       .map((item) => item.durationSeconds!.toDouble())
       .toList();
   if (durations.isEmpty) {
-    return '${group.itemCount} item${group.itemCount != 1 ? 's'}';
+    final count = group.itemCount;
+    final suffix = count == 1 ? '' : 's';
+    return '$count item$suffix';
   }
   final total = durations.fold(0.0, (a, b) => a + b);
   final h = (total / 3600).floor();
   final m = ((total % 3600) / 60).floor();
-  if (h > 0) return '${h}h ${m}m';
+  if (h > 0) {
+    return '${h}h ${m}m';
+  }
   return '${m}m';
 }
 
