@@ -1,9 +1,8 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:watch/core/constants.dart';
 import 'package:watch/models/media_item.dart';
+import 'package:watch/ui/widgets/thumbnail_image.dart';
 import 'package:watch/ui/widgets/watched_progress_bar.dart';
 
 class MediaCard extends StatelessWidget {
@@ -56,18 +55,13 @@ class _Cover extends StatelessWidget {
   const _Cover({required this.group});
   @override
   Widget build(BuildContext context) {
-    final cover = group.coverArtPath;
-    Widget image;
-    if (cover != null && cover.isNotEmpty) {
-      if (kIsWeb) {
-        image = Image.network(cover, fit: BoxFit.cover, errorBuilder: (_, __, ___) => _Icon(group.category));
-      } else {
-        image = Image.file(File(cover), fit: BoxFit.cover, errorBuilder: (_, __, ___) => _Icon(group.category));
-      }
-    } else {
-      image = _Icon(group.category);
-    }
     final fp = _firstVideoPath;
+    Widget image = ThumbnailImage(
+      thumbnailUrl: group.coverArtPath,
+      videoPath: fp,
+      category: group.category,
+      fit: BoxFit.cover,
+    );
     if (fp == null) return image;
     return Stack(
       children: [
@@ -82,23 +76,5 @@ class _Cover extends StatelessWidget {
       if (item.type == MediaType.video) return item.path;
     }
     return null;
-  }
-}
-
-class _Icon extends StatelessWidget {
-  final String category;
-  const _Icon(this.category);
-  @override
-  Widget build(BuildContext context) {
-    final iconMap = {
-      MediaCategory.shows: Icons.tv,
-      MediaCategory.movies: Icons.movie,
-      MediaCategory.porn: Icons.lock,
-    };
-    final icon = iconMap[category] ?? Icons.folder;
-    return ColoredBox(
-      color: Theme.of(context).cardColor,
-      child: Center(child: Icon(icon, size: 44, color: const Color(0xff3c9fdd))),
-    );
   }
 }
