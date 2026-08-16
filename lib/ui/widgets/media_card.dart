@@ -16,8 +16,6 @@ class MediaCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap ?? () {
         final route = {
-          MediaCategory.music: '/music',
-          MediaCategory.shows: '/shows',
           MediaCategory.movies: '/movies',
           MediaCategory.porn: '/porn',
         }[group.category];
@@ -92,7 +90,6 @@ class _Icon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final iconMap = {
-      MediaCategory.music: Icons.album,
       MediaCategory.shows: Icons.tv,
       MediaCategory.movies: Icons.movie,
       MediaCategory.porn: Icons.lock,

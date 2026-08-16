@@ -49,41 +49,11 @@ class MediaScanner {
 
   Future<List<MediaItem>> _scanCategory(String category, String root) async {
     switch (category) {
-      case MediaCategory.music: return _scanMusic(root);
       case MediaCategory.shows: return _scanShows(root);
       case MediaCategory.movies: return _scanMovies(root);
       case MediaCategory.porn: return _scanPorn(root);
       default: return [];
     }
-  }
-
-  Future<List<MediaItem>> _scanMusic(String root) async {
-    final List<MediaItem> items = [];
-    await for (final albumDir in _dirs(root)) {
-      String? albumArt;
-      for (final artFile in ['folder.jpg', 'cover.png', 'cover.jpg', 'art.jpg']) {
-        if (await File(p.join(albumDir.path, artFile)).exists()) {
-          albumArt = p.join(albumDir.path, artFile);
-          break;
-        }
-      }
-      await for (final track in _files(albumDir.path)) {
-        final ext = p.extension(track.path).toLowerCase();
-        if (!supportedAudioExts.contains(ext)) continue;
-        final stat = await track.stat();
-        items.add(MediaItem(
-          path: track.path,
-          category: MediaCategory.music,
-          type: MediaType.audio,
-          title: p.basenameWithoutExtension(track.path),
-          albumArtPath: albumArt,
-          fileSizeBytes: stat.size.toInt(),
-          modified: stat.modified,
-          extension: ext,
-        ));
-      }
-    }
-    return items;
   }
 
   // ── SHOWS ── Series Name/Season 01/Episode 01.mkv
