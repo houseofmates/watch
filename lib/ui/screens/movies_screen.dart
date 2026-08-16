@@ -72,8 +72,6 @@ class MoviesScreen extends ConsumerWidget {
   );
 }
 
-Widget _moviePlaceholder() => Container(color: const Color(0xff0a0a0a), child: const Center(child: Icon(Icons.movie, size: 44, color: Color(0xff3c9fdd))));
-
 class MovieListScreen extends StatelessWidget {
   final String groupName;
   final List<MediaItem> movies;
@@ -100,11 +98,12 @@ class MovieListScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Expanded(child: m.albumArtPath != null
-                      ? (kIsWeb
-                          ? Image.network(m.albumArtPath!, fit: BoxFit.cover)
-                          : Image.file(File(m.albumArtPath!), fit: BoxFit.cover))
-                      : _moviePlaceholder()),
+                  Expanded(child: ThumbnailImage(
+                    thumbnailUrl: m.thumbnailPath,
+                    videoPath: m.path,
+                    category: m.category,
+                    fit: BoxFit.cover,
+                  )),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                     color: Theme.of(context).cardColor,
