@@ -1,11 +1,10 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:watch/core/constants.dart';
 import 'package:watch/models/media_item.dart';
 import 'package:watch/ui/screens/player_screen.dart';
 import 'package:watch/services/providers.dart';
+import 'package:watch/ui/widgets/thumbnail_image.dart';
 import 'package:watch/ui/widgets/watched_progress_bar.dart';
 
 class ShowsScreen extends ConsumerWidget {
