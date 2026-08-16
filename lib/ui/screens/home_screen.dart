@@ -42,12 +42,7 @@ class _CategorySection extends ConsumerWidget {
     final groupsAsync = ref.watch(filteredMediaProvider).whenData(
           (items) => groupMedia(items.where((m) => m.category == category).toList(), category),
         );
-    final catIcon = {
-      'music': Icons.music_note,
-      'shows': Icons.tv,
-      'movies': Icons.movie,
-      'porn': Icons.lock,
-    };
+    final catIcon = {\n      'shows': Icons.tv,\n      'movies': Icons.movie,\n      'porn': Icons.lock,\n    };
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

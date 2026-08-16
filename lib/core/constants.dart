@@ -18,7 +18,7 @@ class MediaCategory {
   static const String movies = 'movies';
   static const String porn = 'porn';
   static const String discover = 'discover';
-  static const List<String> values = [all, discover, music, shows, movies, porn];
+  static const List<String> values = [all, discover, shows, movies, porn];
 }
 
 class MediaType {
