@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:watch/core/constants.dart';
+import 'package:watch/models/media_item.dart';
+import 'package:watch/ui/widgets/thumbnail_image.dart';
+import 'package:watch/ui/widgets/watched_progress_bar.dart';
 
 /// Build a slug-based route path for a group within a category.
 /// Returns e.g. "/shows/my-gym-partners-a-monkey" or "/movies/standalone".
