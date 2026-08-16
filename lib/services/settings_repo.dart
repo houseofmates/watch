@@ -8,7 +8,6 @@ import '../core/constants.dart';
 
 // Dart-define overrides (compiled into APK / web via --dart-define or --dart-define-from-file)
 const _dartMusicRoot  = String.fromEnvironment('WATCH_MUSIC_ROOT');
-const _dartImagesRoot = String.fromEnvironment('WATCH_IMAGES_ROOT');
 const _dartShowsRoot  = String.fromEnvironment('WATCH_SHOWS_ROOT');
 const _dartMoviesRoot = String.fromEnvironment('WATCH_MOVIES_ROOT');
 const _dartPornRoot   = String.fromEnvironment('WATCH_PORN_ROOT');
@@ -34,7 +33,6 @@ class SettingsRepo {
     final env = <String, String>{};
     // 1. Try dart-defines (compiled into APK via --dart-define)
     if (_dartMusicRoot.isNotEmpty)  env['WATCH_MUSIC_ROOT']  = _dartMusicRoot;
-    if (_dartImagesRoot.isNotEmpty) env['WATCH_IMAGES_ROOT'] = _dartImagesRoot;
     if (_dartShowsRoot.isNotEmpty)  env['WATCH_SHOWS_ROOT']  = _dartShowsRoot;
     if (_dartMoviesRoot.isNotEmpty) env['WATCH_MOVIES_ROOT'] = _dartMoviesRoot;
     if (_dartPornRoot.isNotEmpty)   env['WATCH_PORN_ROOT']   = _dartPornRoot;
