@@ -56,33 +56,39 @@ class MediaScanner {
     }
   }
 
-  // ── SHOWS ── Series Name/Season 01/Episode 01.mkv
+  // ── SHOWS ── recursively scan within each show directory
+  // show name = first dir under root; season = first subdir within show
+  // handles nested folders (Extras/SPECIALS/) correctly
   Future<List<MediaItem>> _scanShows(String root) async {
     final items = <MediaItem>[];
     await for (final seriesDir in _dirs(root)) {
       final seriesName = p.basename(seriesDir.path);
-      await for (final seasonDir in _dirs(seriesDir.path)) {
-        final seasonName = p.basename(seasonDir.path);
-        final seasonNum = _extractSeasonNumber(seasonName);
-        await for (final ep in _files(seasonDir.path)) {
-          final ext = p.extension(ep.path).toLowerCase();
-          if (!supportedVideoExts.contains(ext)) continue;
-          final epNum = _extractEpisodeNumber(p.basenameWithoutExtension(ep.path));
-          final stat = await ep.stat();
-          items.add(MediaItem(
-            path: ep.path,
-            category: MediaCategory.shows,
-            type: MediaType.video,
-            title: p.basenameWithoutExtension(ep.path),
-            seriesName: seriesName,
-            season: seasonName,
-            seasonNumber: seasonNum,
-            episodeNumber: epNum,
-            fileSizeBytes: stat.size.toInt(),
-            modified: stat.modified,
-            extension: ext,
-          ));
+      await for (final entity in Directory(seriesDir.path).list(recursive: true, followLinks: false)) {
+        if (entity is! File) continue;
+        final ext = p.extension(entity.path).toLowerCase();
+        if (!supportedVideoExts.contains(ext)) continue;
+        final rel = p.relative(entity.path, from: seriesDir.path);
+        final parts = p.split(rel);
+        String? season;
+        if (parts.length > 1) {
+          season = parts[0];
+          if (season.toLowerCase() == 'extras') season = 'Specials';
         }
+        final stat = await entity.stat();
+        final epNum = _extractEpisodeNumber(p.basenameWithoutExtension(entity.path));
+        items.add(MediaItem(
+          path: entity.path,
+          category: MediaCategory.shows,
+          type: MediaType.video,
+          title: p.basenameWithoutExtension(entity.path),
+          seriesName: seriesName,
+          season: season,
+          seasonNumber: _extractSeasonNumber(season ?? ''),
+          episodeNumber: epNum,
+          fileSizeBytes: stat.size.toInt(),
+          modified: stat.modified,
+          extension: ext,
+        ));
       }
     }
     return items;
