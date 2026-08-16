@@ -4,9 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:watch/core/constants.dart';
 import 'package:watch/models/media_item.dart';
 import 'package:watch/services/providers.dart';
-import 'package:watch/ui/screens/porn_screen.dart';
-import 'package:watch/ui/screens/movies_screen.dart';
-import 'package:watch/ui/screens/shows_screen.dart';
 import 'package:watch/ui/widgets/media_card.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -55,9 +52,28 @@ class _CategorySection extends ConsumerWidget {
           child: Row(children: [
             Icon(catIcon[category] ?? Icons.folder, size: 20),
             const SizedBox(width: 8),
-            Text(category.toLowerCase(), style: Theme.of(context).textTheme.titleLarge),
+            // Clickable category name → navigates to the full category page
+            GestureDetector(
+              onTap: () => context.go('/$category'),
+              child: Text(
+                category.toLowerCase(),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '${groupsAsync.value?.length ?? 0}',
+              style: const TextStyle(color: Colors.grey, fontSize: 14),
+            ),
             const Spacer(),
-            Text('${groupsAsync.value?.length ?? 0}'),
+            TextButton(
+              onPressed: () => context.go('/$category'),
+              child: Text('see all', style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+            ),
           ]),
         ),
         groupsAsync.when(
@@ -71,35 +87,9 @@ class _CategorySection extends ConsumerWidget {
                     itemCount: groups.length,
                     itemBuilder: (_, j) {
                       final group = groups[j];
-                      VoidCallback? onTap;
-                      if (category == MediaCategory.movies) {
-                        onTap = () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => MovieListScreen(groupName: group.name, movies: group.items)),
-                        );
-                      } else if (category == MediaCategory.porn) {
-                        onTap = () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => StudioVideoGrid(studioName: group.name, videos: group.items)),
-                        );
-                      } else if (category == MediaCategory.shows && group.items.isNotEmpty) {
-                        onTap = () {
-                          final allItems = ref.read(filteredMediaProvider).value ?? [];
-                          final Map<String, List<MediaItem>> seasons = {};
-                          for (final m in allItems) {
-                            if (m.category == MediaCategory.shows && m.seriesName == group.name) {
-                              final ss = m.season ?? 'unknown';
-                              seasons.putIfAbsent(ss, () => []).add(m);
-                            }
-                          }
-                          if (seasons.isNotEmpty) {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => SeasonGrid(showName: group.name, seasons: seasons)),
-                            );
-                          }
-                        };
-                      }
                       return Padding(
                         padding: const EdgeInsets.only(right: 12),
-                        child: MediaCard(group: group, onTap: onTap),
+                        child: MediaCard(group: group),
                       );
                     },
                   ),
