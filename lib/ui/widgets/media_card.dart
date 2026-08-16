@@ -38,7 +38,7 @@ class MediaCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(group.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600)),
-                    Text('${group.itemCount} items', style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                    Text(_formatSubtitle(group), style: const TextStyle(color: Colors.grey, fontSize: 11)),
                   ],
                 ),
               ),
