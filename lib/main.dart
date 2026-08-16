@@ -22,7 +22,7 @@ final _router = GoRouter(
     GoRoute(path: '/movies', builder: (_, __) => _Root(child: MoviesScreen())),
     GoRoute(path: '/search', builder: (_, __) => _Root(child: SearchScreen())),
     GoRoute(path: '/settings', builder: (_, __) => _Root(child: SettingsScreen())),
-    GoRoute(path: '/search', builder: (_, __) => _Root(child: SearchScreen())),
+    GoRoute(path: '/porn', builder: (_, __) => _Root(child: PornScreen())),
   ],
 );
 

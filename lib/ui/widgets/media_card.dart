@@ -17,7 +17,6 @@ class MediaCard extends StatelessWidget {
       onTap: onTap ?? () {
         final route = {
           MediaCategory.music: '/music',
-          MediaCategory.images: '/images',
           MediaCategory.shows: '/shows',
           MediaCategory.movies: '/movies',
           MediaCategory.porn: '/porn',
@@ -94,7 +93,6 @@ class _Icon extends StatelessWidget {
   Widget build(BuildContext context) {
     final iconMap = {
       MediaCategory.music: Icons.album,
-      MediaCategory.images: Icons.photo,
       MediaCategory.shows: Icons.tv,
       MediaCategory.movies: Icons.movie,
       MediaCategory.porn: Icons.lock,
