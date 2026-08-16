@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:watch/services/providers.dart';
 import 'package:watch/ui/screens/category_detail_screen.dart';
 import 'package:watch/ui/screens/discover_screen.dart';
+import 'package:watch/ui/screens/home_screen.dart';
+import 'package:watch/ui/screens/shows_screen.dart';
 import 'package:watch/ui/screens/movies_screen.dart';
 import 'package:watch/ui/screens/porn_screen.dart';
 import 'package:watch/ui/screens/search_screen.dart';
@@ -23,10 +25,6 @@ final _router = GoRouter(
     GoRoute(path: '/porn/:slug', builder: (_, state) => _Root(child: CategoryDetailScreen(category: 'porn', slug: state.pathParameters['slug']!))),
     GoRoute(path: '/search', builder: (_, __) => _Root(child: SearchScreen())),
     GoRoute(path: '/settings', builder: (_, __) => _Root(child: SettingsScreen())),
-    GoRoute(path: '/player/:path', builder: (_, state) {
-      final path = state.pathParameters['path']!;
-      return _Root(child: PlayerScreen.fromPath(path));
-    }),
   ],
 );
 
