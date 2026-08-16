@@ -36,7 +36,7 @@ class MediaScanner {
       return raw
           .where((m) {
             final cat = m['category'] as String;
-            return cat != MediaCategory.music && !(cat == MediaCategory.porn && !pornEnabled);
+            return cat != MediaCategory.porn || pornEnabled;
           })
           .map<MediaItem>((m) => MediaItem.fromJson(m))
           .toList()

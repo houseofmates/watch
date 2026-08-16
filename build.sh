@@ -14,7 +14,7 @@ if [ -f "$ENV_FILE" ]; then
   set -a
   source "$ENV_FILE"
   set +a
-  for var in WATCH_MUSIC_ROOT WATCH_IMAGES_ROOT WATCH_SHOWS_ROOT WATCH_MOVIES_ROOT WATCH_PORN_ROOT; do
+  for var in WATCH_SHOWS_ROOT WATCH_MOVIES_ROOT WATCH_PORN_ROOT; do
     val="${!var:-}"
     if [ -n "$val" ]; then
       DART_DEFINES+=("--dart-define=$var=$val")
