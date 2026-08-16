@@ -126,18 +126,6 @@ List<MediaGroup> groupMedia(List<MediaItem> items, String category) {
           items: e.value,
         )).toList();
   }
-  if (category == MediaCategory.music) {
-    final m = <String?, List<MediaItem>>{};
-    for (final item in items.where((i) => i.category == category)) {
-      m.putIfAbsent(item.seriesName, () => []).add(item);
-    }
-    return m.entries.map((e) => MediaGroup(
-          name: e.key ?? 'Unknown Album',
-          category: category,
-          coverArtPath: e.value.isNotEmpty ? e.value.first.albumArtPath : null,
-          items: e.value,
-        )).toList();
-  }
   final m = <String?, List<MediaItem>>{};
   for (final item in items.where((i) => i.category == category)) {
     m.putIfAbsent(item.seriesName, () => []).add(item);
