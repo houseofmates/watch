@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:watch/core/constants.dart';
+import 'package:watch/models/media_item.dart';
 import 'package:watch/ui/screens/player_screen.dart';
 import 'package:watch/services/providers.dart';
 
@@ -20,7 +21,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focus.requestFocus();
-      _ctrl.selection = TextSelection.fromRange(TextRange(start: 0, end: _ctrl.text.length));
     });
   }
 
