@@ -320,7 +320,7 @@ class EpisodeGridScreen extends StatelessWidget {
                       ),
                       Positioned(left: 0, right: 0, bottom: 0, child: WatchedProgressBar(filePath: ep.path)),
                     ],
-                  ))),
+                  )),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                     color: Theme.of(context).cardColor,
