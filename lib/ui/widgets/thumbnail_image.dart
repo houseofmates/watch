@@ -145,11 +145,18 @@ class _ThumbnailImageState extends State<ThumbnailImage> {
   }
 
   Future<void> _forceRegenerate() async {
-    setState(() {
-      _overridePath = null;
-      _localThumbPath = null;
-    });
-    _loadOverrideAndGenerate();
+    if (kIsWeb) {
+      setState(() {
+        _refreshCounter++;
+        _overridePath = null;
+      });
+    } else {
+      setState(() {
+        _overridePath = null;
+        _localThumbPath = null;
+      });
+      _loadOverrideAndGenerate();
+    }
   }
 
   // ── Override management ──────────────────────────────────────────────
@@ -224,16 +231,19 @@ class _ThumbnailImageState extends State<ThumbnailImage> {
 
   void _onUploadFromFile(String mediaId) async {
     try {
-      final result = await FilePicker.platform.pickData(
+      final result = await FilePicker.platform.pickFiles(
         type: FileType.image,
         withData: true,
       );
-      if (result != null && result.bytes != null && result.bytes!.isNotEmpty) {
-        final ok = await _applyOverride(mediaId, imageData: result.bytes!);
-        if (ok && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('thumbnail set'), backgroundColor: Colors.green),
-          );
+      if (result != null && result.files.isNotEmpty) {
+        final bytes = result.files.first.bytes;
+        if (bytes != null && bytes.isNotEmpty) {
+          final ok = await _applyOverride(mediaId, imageData: bytes);
+          if (ok && mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('thumbnail set'), backgroundColor: Colors.green),
+            );
+          }
         }
       }
     } catch (e) {
