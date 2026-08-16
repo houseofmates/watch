@@ -38,7 +38,7 @@ class MediaItem {
   factory MediaItem.dirInfo({required String path, required String category, required String title, String? seriesName, String? season, int? seasonNumber}) =>
       MediaItem(
         path: path, category: category,
-        type: category == MediaCategory.images ? MediaType.image : MediaType.video,
+        type: category == MediaCategory.music ? MediaType.audio : MediaType.video,
         title: title, seriesName: seriesName, season: season, seasonNumber: seasonNumber,
         fileSizeBytes: 0, modified: DateTime(0), extension: '',
       );
