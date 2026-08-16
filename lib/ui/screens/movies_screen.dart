@@ -44,9 +44,10 @@ class MoviesScreen extends ConsumerWidget {
   }
 
   Widget _buildMovieCard(BuildContext context, MediaGroup group, int cols) => GestureDetector(
-    onTap: () => Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => MovieListScreen(groupName: group.name, movies: group.items)),
-    ),
+    onTap: () {
+      final slug = slugify(group.name);
+      context.go('/movies/$slug');
+    },
     child: Card(
       clipBehavior: Clip.hardEdge,
       child: Column(
