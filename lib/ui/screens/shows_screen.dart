@@ -82,8 +82,7 @@ class SeasonGrid extends StatelessWidget {
         itemCount: entries.length,
         itemBuilder: (_, i) {
           final e = entries[i];
-          final placeholder = const _ShowPlaceholder();
-          final firstThumb = e.value.firstWhere((m) => m.thumbnailPath != null, orElse: () => e.value.first).thumbnailPath;
+          final firstVideo = e.value.firstWhere((m) => m.type == MediaType.video, orElse: () => e.value.first);
           return GestureDetector(
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => EpisodeGrid(seasonName: e.key, episodes: e.value)),
@@ -95,11 +94,12 @@ class SeasonGrid extends StatelessWidget {
                 children: [
                   Expanded(child: Stack(
                     children: [
-                      firstThumb != null
-                          ? (kIsWeb
-                              ? Image.network(firstThumb, fit: BoxFit.cover, errorBuilder: (_, __, ___) => placeholder)
-                              : Image.file(File(firstThumb), fit: BoxFit.cover, errorBuilder: (_, __, ___) => placeholder))
-                          : placeholder,
+                      ThumbnailImage(
+                        thumbnailUrl: firstVideo.thumbnailPath,
+                        videoPath: firstVideo.path,
+                        category: MediaCategory.shows,
+                        fit: BoxFit.cover,
+                      ),
                       Positioned(left: 0, right: 0, bottom: 0, child: WatchedProgressBar(filePath: e.value.first.path)),
                     ],
                   )),
@@ -149,7 +149,12 @@ class EpisodeGrid extends StatelessWidget {
                 children: [
                   Expanded(child: Stack(
                     children: [
-                      const _ShowPlaceholder(),
+                      ThumbnailImage(
+                        thumbnailUrl: ep.thumbnailPath,
+                        videoPath: ep.path,
+                        category: MediaCategory.shows,
+                        fit: BoxFit.cover,
+                      ),
                       Positioned(left: 0, right: 0, bottom: 0, child: WatchedProgressBar(filePath: ep.path)),
                     ],
                   )),
