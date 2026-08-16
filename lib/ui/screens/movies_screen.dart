@@ -1,11 +1,10 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:watch/core/constants.dart';
 import 'package:watch/models/media_item.dart';
 import 'package:watch/ui/screens/player_screen.dart';
 import 'package:watch/services/providers.dart';
+import 'package:watch/ui/widgets/thumbnail_image.dart';
 
 class MoviesScreen extends ConsumerWidget {
   const MoviesScreen({super.key});
@@ -53,11 +52,12 @@ class MoviesScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(child: group.coverArtPath != null
-              ? (kIsWeb
-                  ? Image.network(group.coverArtPath!, fit: BoxFit.cover)
-                  : Image.file(File(group.coverArtPath!), fit: BoxFit.cover))
-              : _moviePlaceholder()),
+          Expanded(child: ThumbnailImage(
+            thumbnailUrl: group.coverArtPath,
+            videoPath: group.items.isNotEmpty ? group.items.first.path : null,
+            category: group.category,
+            fit: BoxFit.cover,
+          )),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
             color: Theme.of(context).cardColor,
