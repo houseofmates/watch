@@ -33,9 +33,9 @@ class PornScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(12),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: cols,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-              childAspectRatio: 1.3,
+              crossAxisSpacing: 6,
+              mainAxisSpacing: 6,
+              childAspectRatio: 0.95,
             ),
             itemCount: porn.length,
             itemBuilder: (_, i) {
@@ -48,7 +48,7 @@ class PornScreen extends ConsumerWidget {
               );
               return MediaCard(
                 group: group,
-                aspectRatio: 1.5, // widescreen for video screenshots
+                aspectRatio: 1.3, // slightly landscape for video screenshots
                 width: 140,
                 subtitle: _videoSubtitle(m),
                 onTap: () => Navigator.of(context).push(
