@@ -26,9 +26,9 @@ class MoviesScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(12),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: cols,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-              childAspectRatio: 0.7,
+              crossAxisSpacing: 6,
+              mainAxisSpacing: 6,
+              childAspectRatio: 0.65,
             ),
             itemCount: movies.length,
             itemBuilder: (_, i) {
@@ -41,7 +41,7 @@ class MoviesScreen extends ConsumerWidget {
               );
               return MediaCard(
                 group: group,
-                aspectRatio: 0.8,
+                aspectRatio: 0.75,
                 width: 140,
                 subtitle: _movieSubtitle(m),
                 onTap: () => Navigator.of(context).push(
