@@ -109,9 +109,9 @@ class _SeasonGallery extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: cols,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        childAspectRatio: 0.7,
+        crossAxisSpacing: 6,
+        mainAxisSpacing: 6,
+        childAspectRatio: 0.65,
       ),
       itemCount: seasons.length,
       itemBuilder: (_, i) {
@@ -127,8 +127,8 @@ class _SeasonGallery extends StatelessWidget {
         );
         return MediaCard(
           group: group,
-          aspectRatio: 0.8,
-          width: 130,
+          aspectRatio: 0.75,
+          width: 140,
           subtitle: '${epList.length} episodes',
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(
@@ -157,15 +157,15 @@ class _ItemGallery extends StatelessWidget {
     final w = MediaQuery.of(context).size.width;
     final cols = w < 600 ? 2 : w < 1024 ? 3 : 4;
     final isPorn = category == MediaCategory.porn;
-    final aspectRatio = isPorn ? 1.5 : 0.8;
-    final gridRatio = isPorn ? 1.3 : 0.7;
+    final aspectRatio = isPorn ? 1.3 : 0.75;
+    final gridRatio = isPorn ? 0.95 : 0.65;
 
     return GridView.builder(
       padding: const EdgeInsets.all(12),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: cols,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
+        crossAxisSpacing: 6,
+        mainAxisSpacing: 6,
         childAspectRatio: gridRatio,
       ),
       itemCount: items.length,
@@ -229,9 +229,9 @@ class _EpisodeGrid extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: cols,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
-          childAspectRatio: 0.7,
+          crossAxisSpacing: 6,
+          mainAxisSpacing: 6,
+          childAspectRatio: 0.65,
         ),
         itemCount: episodes.length,
         itemBuilder: (_, i) {
