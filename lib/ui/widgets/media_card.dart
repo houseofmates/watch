@@ -13,22 +13,21 @@ String _routeForGroup(String category, String groupName) {
 }
 
 String _formatSubtitle(MediaGroup group) {
-  final durations = group.items
-      .where((item) => item.durationSeconds != null)
-      .map((item) => item.durationSeconds!.toDouble())
-      .toList();
-  if (durations.isEmpty) {
-    final count = group.itemCount;
-    final suffix = count == 1 ? '' : 's';
-    return '$count item$suffix';
+  // For shows: show season/episode counts, not duration
+  if (group.category == MediaCategory.shows) {
+    final totalEpisodes = group.episodeCount ?? group.itemCount;
+    final epSuffix = totalEpisodes == 1 ? '' : 's';
+    if (group.seasonCount != null && group.seasonCount! > 0) {
+      final s = group.seasonCount!;
+      final sSuffix = s == 1 ? '' : 's';
+      return '$s season$sSuffix, $totalEpisodes episode$epSuffix';
+    }
+    return '$totalEpisodes episode$epSuffix';
   }
-  final total = durations.fold(0.0, (a, b) => a + b);
-  final h = (total / 3600).floor();
-  final m = ((total % 3600) / 60).floor();
-  if (h > 0) {
-    return '${h}h ${m}m';
-  }
-  return '${m}m';
+  // For movies/porn: show item count
+  final count = group.itemCount;
+  final suffix = count == 1 ? '' : 's';
+  return '$count item$suffix';
 }
 
 class MediaCard extends StatelessWidget {
