@@ -220,6 +220,7 @@ class _EpisodeGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final w = MediaQuery.of(context).size.width;
     final cols = w < 600 ? 2 : w < 1024 ? 3 : 4;
     return Scaffold(
       appBar: AppBar(title: Text(seasonName)),
