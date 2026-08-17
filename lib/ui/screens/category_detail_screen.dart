@@ -5,14 +5,15 @@ import 'package:watch/models/media_item.dart';
 import 'package:watch/services/providers.dart';
 import 'package:watch/ui/screens/player_screen.dart';
 import 'package:watch/ui/widgets/thumbnail_image.dart';
+import 'package:watch/ui/widgets/media_card.dart';
 import 'package:watch/ui/widgets/watched_progress_bar.dart';
 
 /// Category detail page reached via URL slug:
-///   `/shows/:slug`         — seasons as horizontal rows of episodes
-///   `/movies/:slug`        — individual movies grid
-///   `/porn/:slug`          — individual videos grid
+///   `/shows/:slug`         — season cards as a gallery; tap → episode grid
+///   `/movies/:slug`        — loose movie cards in a gallery
+///   `/porn/:slug`          — loose video cards in a gallery (horizontal)
 ///
-/// Each thumbnail is right-clickable (web) / long-pressable (mobile)
+/// Each thumbnail is right-clickable (web/desktop) / long-pressable (mobile)
 /// to swap the image via the ThumbnailImage context menu.
 class CategoryDetailScreen extends ConsumerStatefulWidget {
   final String category;
@@ -63,23 +64,14 @@ class _CategoryDetailScreenState extends ConsumerState<CategoryDetailScreen> {
           }
 
           if (widget.category == MediaCategory.shows) {
-            // Group episodes by season
-            final seasons = <String, List<MediaItem>>{};
-            for (final item in matchingGroup.items) {
-              final ssn = item.season ?? 'Unknown';
-              seasons.putIfAbsent(ssn, () => []).add(item);
-            }
-            if (seasons.length == 1) {
-              return _EpisodeGrid(
-                seasonName: seasons.keys.first,
-                episodes: seasons.values.first,
-              );
-            }
-            return _SeasonList(seasons: seasons);
+            return _SeasonGallery(
+              showName: matchingGroup.name,
+              allItems: matchingGroup.items,
+            );
           }
 
-          // Movies and porn: show individual items in a grid
-          return _ItemGrid(
+          // Movies and porn: loose item gallery
+          return _ItemGallery(
             category: widget.category,
             items: matchingGroup.items,
           );
@@ -91,170 +83,142 @@ class _CategoryDetailScreenState extends ConsumerState<CategoryDetailScreen> {
   }
 }
 
-/// List of seasons, each with a horizontal scrollable row of episode thumbnails.
-class _SeasonList extends StatelessWidget {
-  final Map<String, List<MediaItem>> seasons;
+/// Shows seasons as gallery cards (MediaCard-style). Tap a season → episode grid.
+class _SeasonGallery extends StatelessWidget {
+  final String showName;
+  final List<MediaItem> allItems;
 
-  const _SeasonList({required this.seasons});
+  const _SeasonGallery({required this.showName, required this.allItems});
 
   @override
   Widget build(BuildContext context) {
+    // Group items by season
+    final seasons = <String, List<MediaItem>>{};
+    for (final item in allItems) {
+      final ssn = item.season ?? 'Unknown';
+      seasons.putIfAbsent(ssn, () => []).add(item);
+    }
+
     if (seasons.isEmpty) {
       return const Center(child: Text('no seasons found.'));
     }
-    return ListView.builder(
+
+    final w = MediaQuery.of(context).size.width;
+    final cols = w < 600 ? 2 : w < 1024 ? 3 : 4;
+
+    return GridView.builder(
       padding: const EdgeInsets.all(12),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+        childAspectRatio: 0.7,
+      ),
       itemCount: seasons.length,
       itemBuilder: (_, i) {
         final entry = seasons.entries.elementAt(i);
-        final episodes = entry.value;
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                entry.key,
-                style: Theme.of(context).textTheme.titleMedium,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              Text('${episodes.length} episodes',
-                  style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
-              const SizedBox(height: 8),
-              SizedBox(
-                height: 180,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: episodes.length,
-                  itemBuilder: (_, j) {
-                    final ep = episodes[j];
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: SizedBox(
-                        width: 120,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Expanded(
-                              child: Card(
-                                clipBehavior: Clip.hardEdge,
-                                child: Stack(
-                                  children: [
-                                    ThumbnailImage(
-                                      thumbnailUrl: ep.thumbnailPath,
-                                      videoPath: ep.path,
-                                      category: ep.category,
-                                      fit: BoxFit.cover,
-                                    ),
-                                    Positioned(
-                                      left: 0, right: 0, bottom: 0,
-                                      child: WatchedProgressBar(filePath: ep.path),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Text(
-                              ep.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 11),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
+        final epList = entry.value;
+        final firstEp = epList.firstWhere(
+            (m) => m.type == MediaType.video, orElse: () => epList.first);
+        final group = MediaGroup(
+          name: entry.key,
+          category: MediaCategory.shows,
+          coverArtPath: firstEp.thumbnailPath,
+          items: epList,
         );
-      },
-    );
-  }
-}
-
-/// Grid of individual media items (movies, porn videos, episodes).
-class _ItemGrid extends StatelessWidget {
-  final String category;
-  final List<MediaItem> items;
-
-  const _ItemGrid({required this.category, required this.items});
-
-  @override
-  Widget build(BuildContext context) {
-    final w = MediaQuery.of(context).size.width;
-    final cols = w < 600 ? 2 : w < 1024 ? 3 : 4;
-    return GridView.builder(
-      padding: const EdgeInsets.all(12),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: cols,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        childAspectRatio: 0.75,
-      ),
-      itemCount: items.length,
-      itemBuilder: (_, i) {
-        final m = items[i];
-        return GestureDetector(
+        return MediaCard(
+          group: group,
+          aspectRatio: 0.8,
+          width: 130,
+          subtitle: '${epList.length} episodes',
           onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => PlayerScreen(mediaItem: m)),
-          ),
-          child: Card(
-            clipBehavior: Clip.hardEdge,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(child: Stack(
-                  children: [
-                    ThumbnailImage(
-                      thumbnailUrl: m.thumbnailPath,
-                      videoPath: m.path,
-                      category: m.category,
-                      fit: BoxFit.cover,
-                    ),
-                    if (m.type == MediaType.video)
-                      Positioned(
-                        left: 0, right: 0, bottom: 0,
-                        child: WatchedProgressBar(filePath: m.path),
-                      ),
-                  ],
-                )),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                  color: Theme.of(context).cardColor,
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(m.title, maxLines: 2, overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.w600)),
-                    if (m.durationSeconds != null)
-                      Text(_formatDuration(m.durationSeconds!),
-                          style: const TextStyle(color: Colors.grey, fontSize: 11)),
-                  ]),
-                ),
-              ],
+            MaterialPageRoute(
+              builder: (_) => _EpisodeGrid(
+                showName: showName,
+                seasonName: entry.key,
+                episodes: epList,
+              ),
             ),
           ),
         );
       },
     );
   }
+}
 
-  String _formatDuration(int totalSeconds) {
-    final h = totalSeconds ~/ 3600;
-    final m = (totalSeconds % 3600) ~/ 60;
-    if (h > 0) return '${h}h ${m}m';
-    return '${m}m';
+/// Grid of individual media items (movies or porn videos). Tap → play.
+class _ItemGallery extends StatelessWidget {
+  final String category;
+  final List<MediaItem> items;
+
+  const _ItemGallery({required this.category, required this.items});
+
+  @override
+  Widget build(BuildContext context) {
+    final w = MediaQuery.of(context).size.width;
+    final cols = w < 600 ? 2 : w < 1024 ? 3 : 4;
+    final isPorn = category == MediaCategory.porn;
+    final aspectRatio = isPorn ? 1.5 : 0.8;
+    final gridRatio = isPorn ? 1.3 : 0.7;
+
+    return GridView.builder(
+      padding: const EdgeInsets.all(12),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: cols,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+        childAspectRatio: gridRatio,
+      ),
+      itemCount: items.length,
+      itemBuilder: (_, i) {
+        final m = items[i];
+        final group = MediaGroup(
+          name: m.title,
+          category: category,
+          coverArtPath: m.thumbnailPath,
+          items: [m],
+        );
+        return MediaCard(
+          group: group,
+          aspectRatio: aspectRatio,
+          width: 140,
+          subtitle: _subtitle(m, isPorn),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => PlayerScreen(mediaItem: m)),
+          ),
+        );
+      },
+    );
+  }
+
+  String _subtitle(MediaItem m, bool isPorn) {
+    if (isPorn && m.durationSeconds != null) {
+      final total = m.durationSeconds!;
+      final h = total ~/ 3600;
+      final min = (total % 3600) ~/ 60;
+      return h > 0 ? '${h}h ${min}m' : '${min}m';
+    }
+    if (m.durationSeconds != null) {
+      final total = m.durationSeconds!;
+      final h = total ~/ 3600;
+      final min = (total % 3600) ~/ 60;
+      return h > 0 ? '${h}h ${min}m' : '${min}m';
+    }
+    return m.extension;
   }
 }
 
-/// Full-screen episode grid (for single-season shows).
+/// Full-screen episode grid — tapped from a season card.
 class _EpisodeGrid extends StatelessWidget {
+  final String showName;
   final String seasonName;
   final List<MediaItem> episodes;
 
-  const _EpisodeGrid({required this.seasonName, required this.episodes});
+  const _EpisodeGrid({
+    required this.showName,
+    required this.seasonName,
+    required this.episodes,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -264,8 +228,11 @@ class _EpisodeGrid extends StatelessWidget {
       appBar: AppBar(title: Text(seasonName)),
       body: GridView.builder(
         padding: const EdgeInsets.all(12),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: cols, crossAxisSpacing: 8, mainAxisSpacing: 8, childAspectRatio: 0.75,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          childAspectRatio: 0.7,
         ),
         itemCount: episodes.length,
         itemBuilder: (_, i) {
@@ -286,8 +253,13 @@ class _EpisodeGrid extends StatelessWidget {
                         videoPath: ep.path,
                         category: ep.category,
                         fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
                       ),
-                      Positioned(left: 0, right: 0, bottom: 0, child: WatchedProgressBar(filePath: ep.path)),
+                      Positioned(
+                        left: 0, right: 0, bottom: 0,
+                        child: WatchedProgressBar(filePath: ep.path),
+                      ),
                     ],
                   )),
                   Container(
