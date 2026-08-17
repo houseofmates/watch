@@ -103,6 +103,7 @@ class _SeasonGallery extends StatelessWidget {
       return const Center(child: Text('no seasons found.'));
     }
 
+    final w = MediaQuery.of(context).size.width;
     final cols = w < 600 ? 2 : w < 1024 ? 3 : 4;
     return GridView.builder(
       padding: const EdgeInsets.all(12),
