@@ -106,7 +106,7 @@ class _CategorySection extends ConsumerWidget {
         ),
         const Divider(),
       ],
-    ),
+    );
   }
 }
 
