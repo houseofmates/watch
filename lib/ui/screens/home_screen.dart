@@ -79,7 +79,7 @@ class _CategorySection extends ConsumerWidget {
           data: (groups) => groups.isEmpty
               ? const Padding(padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24), child: Text('nothing here yet.', style: TextStyle(color: Colors.grey)))
               : SizedBox(
-                  height: 240,
+                  height: category == 'porn' ? 180 : 245,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -88,12 +88,16 @@ class _CategorySection extends ConsumerWidget {
                       final group = groups[j];
                       return Padding(
                         padding: const EdgeInsets.only(right: 12),
-                        child: MediaCard(group: group),
+                        child: MediaCard(
+                          group: group,
+                          aspectRatio: category == 'porn' ? 1.5 : 0.85,
+                          width: category == 'porn' ? 200 : 170,
+                        ),
                       );
                     },
                   ),
                 ),
-          loading: () => const SizedBox(height: 240, child: Center(child: CircularProgressIndicator())),
+          loading: () => SizedBox(height: category == 'porn' ? 180 : 245, child: const Center(child: CircularProgressIndicator())),
           error: (e, _) => Padding(padding: const EdgeInsets.all(16), child: Text('error: $e')),
         ),
         const Divider(),
