@@ -111,12 +111,14 @@ List<MediaGroup> groupMedia(List<MediaItem> items, String category) {
       final realSeasonKeys = e.value.keys.where((k) => k != 'Unknown');
       final hasSeasonFolders = realSeasonKeys.isNotEmpty;
       final seasonCount = hasSeasonFolders ? realSeasonKeys.length : null;
-      final totalEpisodes = allSeasons.fold(0, (sum, s) => sum + s.length);
+      // Include ALL items (all seasons) so the detail page can show every season
+      final allItems = allSeasons.expand((s) => s).toList();
+      final totalEpisodes = allItems.length;
       return MediaGroup(
         name: e.key,
         category: category,
         coverArtPath: firstSeason.isNotEmpty ? firstSeason.first.thumbnailPath : null,
-        items: firstSeason,
+        items: allItems,
         seasonCount: seasonCount,
         episodeCount: totalEpisodes,
       );
