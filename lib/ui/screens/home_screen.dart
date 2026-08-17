@@ -106,6 +106,22 @@ class _CategorySection extends ConsumerWidget {
         ),
         const Divider(),
       ],
-    );
+    ),
   }
+}
+
+/// Format duration for porn cards on the home screen.
+/// Shows "1h 23m" or "45m" for the first video item in the group.
+String _pornDurationSubtitle(MediaGroup group) {
+  if (group.items.isEmpty) return '';
+  final item = group.items.firstWhere(
+    (i) => i.type == MediaType.video,
+    orElse: () => group.items.first,
+  );
+  final d = item.durationSeconds;
+  if (d == null || d <= 0) return '';
+  final h = d ~/ 3600;
+  final m = (d % 3600) ~/ 60;
+  if (h > 0) return '${h}h ${m}m';
+  return '${m}m';
 }
