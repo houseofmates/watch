@@ -105,12 +105,20 @@ List<MediaGroup> groupMedia(List<MediaItem> items, String category) {
       m[s]!.putIfAbsent(ss, () => []).add(item);
     }
     return m.entries.map((e) {
-      final firstSeason = e.value.values.first;
+      final allSeasons = e.value.values;
+      final firstSeason = allSeasons.first;
+      // Count real season folders (exclude 'Unknown' which is the flat-directory bucket)
+      final realSeasonKeys = e.value.keys.where((k) => k != 'Unknown');
+      final hasSeasonFolders = realSeasonKeys.isNotEmpty;
+      final seasonCount = hasSeasonFolders ? realSeasonKeys.length : null;
+      final totalEpisodes = allSeasons.fold(0, (sum, s) => sum + s.length);
       return MediaGroup(
         name: e.key,
         category: category,
         coverArtPath: firstSeason.isNotEmpty ? firstSeason.first.thumbnailPath : null,
         items: firstSeason,
+        seasonCount: seasonCount,
+        episodeCount: totalEpisodes,
       );
     }).toList();
   }
