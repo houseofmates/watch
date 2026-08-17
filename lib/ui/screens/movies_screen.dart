@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:watch/core/constants.dart';
 import 'package:watch/models/media_item.dart';
-import 'package:watch/ui/screens/player_screen.dart';
 import 'package:watch/services/providers.dart';
-import 'package:watch/ui/widgets/thumbnail_image.dart';
+import 'package:watch/ui/screens/player_screen.dart';
+import 'package:watch/ui/widgets/media_card.dart';
 
+/// /movies — loose gallery of individual movie cards (no folder grouping).
+/// Each card shows the movie poster (TMDb) or video frame.
+/// Tap a card → play the movie directly.
 class MoviesScreen extends ConsumerWidget {
   const MoviesScreen({super.key});
   @override
@@ -17,24 +19,35 @@ class MoviesScreen extends ConsumerWidget {
       body: items.when(
         data: (all) {
           final movies = all.where((m) => m.category == MediaCategory.movies).toList();
-          final Map<String?, List<MediaItem>> groups = {};
-          for (final m in movies) {
-            groups.putIfAbsent(m.seriesName ?? 'Standalone', () => []).add(m);
-          }
-          if (groups.isEmpty) return const Center(child: Text('no movies found.'));
+          if (movies.isEmpty) return const Center(child: Text('no movies found.'));
           final w = MediaQuery.of(context).size.width;
           final cols = w < 600 ? 2 : w < 1024 ? 3 : 4;
           return GridView.builder(
             padding: const EdgeInsets.all(12),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: cols, crossAxisSpacing: 8, mainAxisSpacing: 8,
-              childAspectRatio: 0.75,
+              crossAxisCount: cols,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+              childAspectRatio: 0.7,
             ),
-            itemCount: groups.length,
+            itemCount: movies.length,
             itemBuilder: (_, i) {
-              final e = groups.entries.elementAt(i);
-              final group = MediaGroup(name: e.key ?? 'Standalone', category: MediaCategory.movies, items: e.value);
-              return _buildMovieCard(context, group, cols);
+              final m = movies[i];
+              final group = MediaGroup(
+                name: m.title,
+                category: MediaCategory.movies,
+                coverArtPath: m.thumbnailPath,
+                items: [m],
+              );
+              return MediaCard(
+                group: group,
+                aspectRatio: 0.8,
+                width: 140,
+                subtitle: _movieSubtitle(m),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => PlayerScreen(mediaItem: m)),
+                ),
+              );
             },
           );
         },
@@ -44,79 +57,16 @@ class MoviesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMovieCard(BuildContext context, MediaGroup group, int cols) => GestureDetector(
-    onTap: () {
-      final slug = slugify(group.name);
-      context.go('/movies/$slug');
-    },
-    child: Card(
-      clipBehavior: Clip.hardEdge,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(child: ThumbnailImage(
-            thumbnailUrl: group.coverArtPath,
-            videoPath: group.items.isNotEmpty ? group.items.first.path : null,
-            category: group.category,
-            fit: BoxFit.cover,
-          )),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-            color: Theme.of(context).cardColor,
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(group.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600)),
-              Text('${group.itemCount} movies', style: const TextStyle(color: Color(0xff3c9fdd), fontSize: 11)),
-            ]),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-class MovieListScreen extends StatelessWidget {
-  final String groupName;
-  final List<MediaItem> movies;
-  const MovieListScreen({super.key, required this.groupName, required this.movies});
-
-  @override
-  Widget build(BuildContext context) {
-    final w = MediaQuery.of(context).size.width;
-    final cols = w < 600 ? 2 : w < 1024 ? 3 : 4;
-    return Scaffold(
-      appBar: AppBar(title: Text(groupName)),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(12),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: cols, crossAxisSpacing: 8, mainAxisSpacing: 8, childAspectRatio: 0.75,
-        ),
-        itemCount: movies.length,
-        itemBuilder: (_, i) {
-          final m = movies[i];
-          return GestureDetector(
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => PlayerScreen(mediaItem: m))),
-            child: Card(
-              clipBehavior: Clip.hardEdge,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(child: ThumbnailImage(
-                    thumbnailUrl: m.thumbnailPath,
-                    videoPath: m.path,
-                    category: m.category,
-                    fit: BoxFit.cover,
-                  )),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                    color: Theme.of(context).cardColor,
-                    child: Text(m.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600)),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
+  String _movieSubtitle(MediaItem m) {
+    final parts = <String>[];
+    if (m.durationSeconds != null) {
+      final total = m.durationSeconds!;
+      final h = total ~/ 3600;
+      final min = (total % 3600) ~/ 60;
+      if (h > 0) parts.add('${h}h ${min}m');
+      else parts.add('${min}m');
+    }
+    if (m.extension.isNotEmpty) parts.add(m.extension.substring(1));
+    return parts.join(' · ');
   }
 }
