@@ -50,6 +50,7 @@ class MediaItem {
 
   static int? _intOrNull(dynamic v) {
     if (v is int) return v >= 0 ? v : null;
+    if (v is double) return v >= 0 ? v.toInt() : null;
     return null;
   }
 
