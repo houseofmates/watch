@@ -31,7 +31,7 @@ class PornScreen extends ConsumerWidget {
           final cols = w < 600 ? 2 : w < 1024 ? 3 : 4;
           return GridView.builder(
             padding: const EdgeInsets.all(12),
-            gridDelegate: SliverGridDelegateWithCrossAxisSpacing(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: cols,
               crossAxisSpacing: 8,
               mainAxisSpacing: 8,
