@@ -23,11 +23,11 @@ class ShowsScreen extends ConsumerWidget {
           final cols = w < 600 ? 2 : w < 1024 ? 3 : 4;
           return GridView.builder(
             padding: const EdgeInsets.all(12),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: cols,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-              childAspectRatio: 0.7,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              crossAxisSpacing: 6,
+              mainAxisSpacing: 6,
+              childAspectRatio: 0.65,
             ),
             itemCount: groups.length,
             itemBuilder: (_, i) {
