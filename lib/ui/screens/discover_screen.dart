@@ -354,9 +354,21 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
           children: [
             Expanded(
               child: posterUrl != null
-                  ? (kIsWeb
-                      ? Image.network(posterUrl, fit: BoxFit.cover, width: double.infinity, errorBuilder: (_, __, ___) => placeholder)
-                      : Image.file(File(posterUrl), fit: BoxFit.cover, width: double.infinity, errorBuilder: (_, __, ___) => placeholder))
+                  ? (posterUrl.startsWith('http://') ||
+                      posterUrl.startsWith('https://') ||
+                      posterUrl.startsWith('/'))
+                      ? Image.network(
+                          posterUrl,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          errorBuilder: (_, __, ___) => placeholder,
+                        )
+                      : Image.file(
+                          File(posterUrl),
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          errorBuilder: (_, __, ___) => placeholder,
+                        )
                   : placeholder,
             ),
             Padding(
