@@ -350,7 +350,11 @@ class _ThumbnailImageState extends State<ThumbnailImage> {
     }
     // 2. Server-provided thumbnail URL or local file path
     else if (widget.thumbnailUrl != null && widget.thumbnailUrl!.isNotEmpty) {
-      if (widget.thumbnailUrl!.startsWith('http://') || widget.thumbnailUrl!.startsWith('https://')) {
+      // Network URLs (http/https) and server API paths (/api/...) use Image.network.
+      // Only bare file-system paths use Image.file.
+      if (widget.thumbnailUrl!.startsWith('http://') ||
+          widget.thumbnailUrl!.startsWith('https://') ||
+          widget.thumbnailUrl!.startsWith('/')) {
         image = Image.network(
           widget.thumbnailUrl!,
           key: ValueKey('network_thumb_$_refreshCounter'),

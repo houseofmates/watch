@@ -111,6 +111,15 @@ class MediaGroup {
   final String category;
   final String? coverArtPath;
   final List<MediaItem> items;
-  MediaGroup({required this.name, required this.category, this.coverArtPath, required this.items});
+  final int? seasonCount;   // for shows: number of season folders (null if flat)
+  final int? episodeCount;  // for shows: total episodes across all seasons
+  MediaGroup({
+    required this.name,
+    required this.category,
+    this.coverArtPath,
+    required this.items,
+    this.seasonCount,
+    this.episodeCount,
+  });
   int get itemCount => items.length;
 }
