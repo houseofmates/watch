@@ -63,10 +63,15 @@ class MoviesScreen extends ConsumerWidget {
       final total = m.durationSeconds!;
       final h = total ~/ 3600;
       final min = (total % 3600) ~/ 60;
-      if (h > 0) parts.add('${h}h ${min}m');
-      else parts.add('${min}m');
+      if (h > 0) {
+        parts.add('${h}h ${min}m');
+      } else {
+        parts.add('${min}m');
+      }
     }
-    if (m.extension.isNotEmpty) parts.add(m.extension.substring(1));
+    if (m.extension.isNotEmpty) {
+      parts.add(m.extension.substring(1));
+    }
     return parts.join(' · ');
   }
 }
