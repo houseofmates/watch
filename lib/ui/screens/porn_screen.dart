@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:watch/core/constants.dart';
 import 'package:watch/models/media_item.dart';
-import 'package:watch/ui/screens/player_screen.dart';
-import 'package:watch/ui/widgets/thumbnail_image.dart';
-import 'package:watch/ui/widgets/watched_progress_bar.dart';
 import 'package:watch/services/providers.dart';
+import 'package:watch/ui/screens/player_screen.dart';
+import 'package:watch/ui/widgets/media_card.dart';
 
+/// /porn — loose gallery of individual video cards (not dropdowns).
+/// Each card shows a horizontal video screenshot with the title below.
+/// Tap a card → play the video directly.
 class PornScreen extends ConsumerWidget {
   const PornScreen({super.key});
   @override
@@ -24,24 +26,34 @@ class PornScreen extends ConsumerWidget {
       body: items.when(
         data: (all) {
           final porn = all.where((m) => m.category == MediaCategory.porn).toList();
-          final Map<String, List<MediaItem>> byStudio = {};
-          for (final m in porn) {
-            byStudio.putIfAbsent(m.seriesName ?? 'unknown', () => []).add(m);
-          }
-          if (byStudio.isEmpty) return const Center(child: Text('no adult content found.'));
-          return ListView.builder(
+          if (porn.isEmpty) return const Center(child: Text('no adult content found.'));
+          final w = MediaQuery.of(context).size.width;
+          final cols = w < 600 ? 2 : w < 1024 ? 3 : 4;
+          return GridView.builder(
             padding: const EdgeInsets.all(12),
-            itemCount: byStudio.length,
+            gridDelegate: SliverGridDelegateWithCrossAxisSpacing(
+              crossAxisCount: cols,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+              childAspectRatio: 1.3,
+            ),
+            itemCount: porn.length,
             itemBuilder: (_, i) {
-              final e = byStudio.entries.elementAt(i);
-              return ExpansionTile(
-                leading: const Icon(Icons.lock, size: 36),
-                title: Text(e.key),
-                subtitle: Text('${e.value.length} videos'),
-                children: e.value.map((m) => ListTile(
-                  title: Text(m.title),
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => PlayerScreen(mediaItem: m))),
-                )).toList(),
+              final m = porn[i];
+              final group = MediaGroup(
+                name: m.title,
+                category: MediaCategory.porn,
+                coverArtPath: m.thumbnailPath,
+                items: [m],
+              );
+              return MediaCard(
+                group: group,
+                aspectRatio: 1.5, // widescreen for video screenshots
+                width: 140,
+                subtitle: _videoSubtitle(m),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => PlayerScreen(mediaItem: m)),
+                ),
               );
             },
           );
@@ -51,56 +63,16 @@ class PornScreen extends ConsumerWidget {
       ),
     );
   }
-}
 
-class StudioVideoGrid extends StatelessWidget {
-  final String studioName;
-  final List<MediaItem> videos;
-  const StudioVideoGrid({super.key, required this.studioName, required this.videos});
-
-  @override
-  Widget build(BuildContext context) {
-    final w = MediaQuery.of(context).size.width;
-    final cols = w < 600 ? 2 : w < 1024 ? 3 : 4;
-    return Scaffold(
-      appBar: AppBar(title: Text(studioName)),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(12),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: cols, crossAxisSpacing: 8, mainAxisSpacing: 8, childAspectRatio: 0.75,
-        ),
-        itemCount: videos.length,
-        itemBuilder: (_, i) {
-          final m = videos[i];
-          return GestureDetector(
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => PlayerScreen(mediaItem: m))),
-            child: Card(
-              clipBehavior: Clip.hardEdge,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(child: Stack(
-                    children: [
-                      ThumbnailImage(
-                        thumbnailUrl: m.thumbnailPath,
-                        videoPath: m.path,
-                        category: MediaCategory.porn,
-                        fit: BoxFit.cover,
-                      ),
-                      Positioned(left: 0, right: 0, bottom: 0, child: WatchedProgressBar(filePath: m.path)),
-                    ],
-                  )),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                    color: Theme.of(context).cardColor,
-                    child: Text(m.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600)),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
+  String _videoSubtitle(MediaItem m) {
+    final parts = <String>[];
+    if (m.durationSeconds != null) {
+      final total = m.durationSeconds!;
+      final h = total ~/ 3600;
+      final min = (total % 3600) ~/ 60;
+      if (h > 0) parts.add('${h}h ${min}m');
+      else parts.add('${min}m');
+    }
+    return parts.isNotEmpty ? parts.join(' · ') : m.extension;
   }
 }
