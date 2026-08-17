@@ -430,9 +430,9 @@ class _DetailSheet extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: posterUrl != null
-                        ? (posterUrl.startsWith('http://') ||
-                            posterUrl.startsWith('https://') ||
-                            posterUrl.startsWith('/'))
+                        ? (posterUrl!.startsWith('http://') ||
+                            posterUrl!.startsWith('https://') ||
+                            posterUrl!.startsWith('/'))
                             ? Image.network(posterUrl!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => placeholder)
                             : Image.file(File(posterUrl!), fit: BoxFit.cover, errorBuilder: (_, __, ___) => placeholder)
                         : placeholder,
