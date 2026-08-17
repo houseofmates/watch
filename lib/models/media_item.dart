@@ -99,7 +99,7 @@ class MediaItem {
       fileSizeBytes: m['fileSizeBytes'] as int? ?? 0,
       modified: parseModified(m['modified']),
       extension: m['extension'] as String? ?? '',
-      durationSeconds: m['durationSeconds'] as int?,
+      durationSeconds: _intOrNull(m['durationSeconds']),
       thumbnailPath: m['thumbnailPath'] as String?,
       subtitle: m['subtitle'] as String?,
     );
