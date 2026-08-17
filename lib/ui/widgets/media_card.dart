@@ -47,7 +47,7 @@ class MediaCard extends StatelessWidget {
     super.key,
     required this.group,
     this.onTap,
-    this.aspectRatio = 0.75,
+    this.aspectRatio = 0.85,
     this.width = 160,
     this.subtitle,
   });

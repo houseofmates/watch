@@ -91,7 +91,7 @@ class _CategorySection extends ConsumerWidget {
                         padding: const EdgeInsets.only(right: 12),
                         child: MediaCard(
                           group: group,
-                          aspectRatio: category == 'porn' ? 1.5 : 0.85,
+                          aspectRatio: category == 'porn' ? 1.3 : 0.85,
                           width: category == 'porn' ? 200 : 170,
                           subtitle: category == 'porn'
                               ? _pornDurationSubtitle(group)
