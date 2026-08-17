@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:watch/core/constants.dart';
+import 'package:watch/models/media_item.dart';
 import 'package:watch/services/providers.dart';
 import 'package:watch/ui/widgets/media_card.dart';
 
@@ -92,6 +93,9 @@ class _CategorySection extends ConsumerWidget {
                           group: group,
                           aspectRatio: category == 'porn' ? 1.5 : 0.85,
                           width: category == 'porn' ? 200 : 170,
+                          subtitle: category == 'porn'
+                              ? _pornDurationSubtitle(group)
+                              : null,
                         ),
                       );
                     },
